@@ -1,0 +1,41 @@
+name: vpendrive
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vpendrive:latest
+    container_name: vpendrive
+    restart: unless-stopped
+    init: true                      # tini como PID 1 (sinais e processos zumbis)
+    ports:
+      - "${VPENDRIVE_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      STORAGE_DIR: /app/storage
+      CONFIG_PATH: /app/config/config.json
+      # Descomente para FORÇAR via env (tem prioridade sobre config.json e
+      # sobre alterações feitas por PUT /api/admin/config após reiniciar):
+      # RETENTION_DAYS: ${RETENTION_DAYS:-3}
+      # MAX_FILE_SIZE_BYTES: ${MAX_FILE_SIZE_BYTES:-16106127360}
+      # CHUNK_SIZE_BYTES: ${CHUNK_SIZE_BYTES:-52428800}
+      # CLEANUP_INTERVAL_MINUTES: ${CLEANUP_INTERVAL_MINUTES:-60}
+    volumes:
+      # Arquivos enviados, pastes, chunks temporários e banco SQLite
+      - vpendrive-storage:/app/storage
+      # Configuração editável pelo host e gravável pelo endpoint admin
+      - ./config:/app/config
+      # Alternativa: guardar os arquivos numa pasta do host (mais lento no Windows/WSL2)
+      # - ./storage:/app/storage
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  vpendrive-storage:

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vpendrive – Compartilhe textos e arquivos .zip/.7z</title>
+  <meta name="description" content="Cole textos ou envie arquivos .zip e .7z de até 15 GB e compartilhe por link. Hash MD5, download .txt e expiração automática.">
+  <meta name="theme-color" content="#0a0c13">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="site-header container">
+    <a class="brand" href="/" id="brand-link" aria-label="vpendrive – início">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9z"/><rect x="6" y="7" width="12" height="14" rx="3"/><path d="M10 12h4M10 16h4"/></svg>
+      </span>
+      vpendrive
+    </a>
+    <span class="pill"><span class="dot"></span>Sem cadastro · expira em <b data-cfg="retention">3 dias</b></span>
+  </header>
+
+  <main class="container">
+    <div class="intro-box">
+      <p class="intro-text">
+        Cole um texto ou envie um <b>.zip</b> / <b>.7z</b> de até <b data-cfg="maxFile">15 GB</b>. Você recebe um link com hash MD5 para conferir a integridade.
+      </p>
+    </div>
+
+    <section class="card panel-card" aria-label="Criar compartilhamento">
+      <div class="tabs" role="tablist" id="tabs" data-active="text">
+        <span class="tab-indicator" aria-hidden="true"></span>
+        <button class="tab" role="tab" id="tab-text" aria-selected="true" aria-controls="panel-text" data-tab="text">📋 Colar texto</button>
+        <button class="tab" role="tab" id="tab-file" aria-selected="false" aria-controls="panel-file" data-tab="file">📦 Enviar arquivo</button>
+      </div>
+
+      <!-- ===== Painel: texto ===== -->
+      <div class="panel" role="tabpanel" id="panel-text" aria-labelledby="tab-text">
+        <form id="paste-form" class="stack" autocomplete="off">
+          <label class="sr-only" for="paste-title">Título</label>
+          <input class="field" id="paste-title" name="title" maxlength="200" placeholder="Título (opcional) — vira o nome do .txt">
+          <label class="sr-only" for="paste-content">Conteúdo</label>
+          <textarea class="field" id="paste-content" name="content" spellcheck="false" placeholder="Cole seu texto aqui…" required></textarea>
+          <div class="form-footer">
+            <span class="counter muted" id="paste-counter">0 caracteres · 0 B de <span data-cfg="maxPaste">10 MB</span></span>
+            <div class="btn-row" style="align-items:center">
+              <span class="hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd></span>
+              <button class="btn btn-primary btn-lg" type="submit" id="btn-create-paste">Criar paste</button>
+            </div>
+          </div>
+        </form>
+
+        <div class="result hidden" id="paste-result" aria-live="polite">
+          <div class="result-head">
+            <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+            <div>
+              <h2>Paste criado!</h2>
+              <div class="muted" style="font-size:.85rem">Expira em <b data-cfg="retention">3 dias</b></div>
+            </div>
+          </div>
+          <span class="label">Link</span>
+          <div class="copy-field">
+            <input class="field" id="paste-link" readonly>
+            <button class="btn" type="button" id="btn-copy-paste-link" data-copy-target="#paste-link" data-copy-msg="Link copiado!">Copiar</button>
+          </div>
+          <span class="label">MD5 do .txt</span>
+          <div class="copy-field">
+            <input class="field" id="paste-md5" readonly>
+            <button class="btn" type="button" id="btn-copy-paste-md5" data-copy-target="#paste-md5" data-copy-msg="MD5 copiado!">Copiar</button>
+          </div>
+          <div class="btn-row" style="margin-top:14px">
+            <a class="btn btn-primary" id="btn-open-paste" href="#">Abrir paste</a>
+            <a class="btn" id="btn-download-paste-txt" href="#">Baixar .txt</a>
+            <a class="btn" id="btn-download-paste-md5" href="#">Baixar .md5</a>
+            <button class="btn btn-ghost" type="button" id="btn-new-paste">Novo paste</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Painel: arquivo ===== -->
+      <div class="panel" role="tabpanel" id="panel-file" aria-labelledby="tab-file" hidden>
+        <div class="banner hidden" id="resume-banner">
+          <span id="resume-text"></span>
+          <button class="btn btn-sm" type="button" id="btn-discard-pending">Descartar</button>
+        </div>
+
+        <label class="dropzone" id="dropzone" for="file-input" tabindex="0">
+          <span class="drop-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+          </span>
+          <span class="drop-title">Arraste o arquivo aqui</span>
+          <span class="drop-sub">ou clique para escolher</span>
+          <span class="chips">
+            <span class="chip" data-cfg="exts">.zip · .7z</span>
+            <span class="chip">até <span data-cfg="maxFile">15 GB</span></span>
+            <span class="chip">retomável</span>
+          </span>
+          <input type="file" id="file-input" accept=".zip,.7z" hidden>
+        </label>
+
+        <div class="upload-box hidden" id="upload-box">
+          <div class="file-head">
+            <span class="file-icon" id="upload-badge">zip</span>
+            <div class="file-meta">
+              <div class="file-name" id="upload-name">arquivo.zip</div>
+              <div class="muted" style="font-size:.85rem" id="upload-size">0 B</div>
+            </div>
+          </div>
+          <div class="progress" id="upload-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="progress-bar" id="upload-bar"></div>
+          </div>
+          <div class="stats">
+            <div class="stat"><div class="stat-label">Progresso</div><div class="stat-value" id="stat-percent">0%</div></div>
+            <div class="stat"><div class="stat-label">Enviado</div><div class="stat-value" id="stat-sent">0 B</div></div>
+            <div class="stat"><div class="stat-label">Velocidade</div><div class="stat-value" id="stat-speed">—</div></div>
+            <div class="stat"><div class="stat-label">Restante</div><div class="stat-value" id="stat-eta">—</div></div>
+          </div>
+          <div class="status-line" id="upload-status">Preparando…</div>
+          <div class="btn-row">
+            <button class="btn" type="button" id="btn-pause">⏸ Pausar</button>
+            <button class="btn btn-primary hidden" type="button" id="btn-resume">▶ Retomar</button>
+            <button class="btn btn-danger" type="button" id="btn-cancel">✕ Cancelar</button>
+            <button class="btn hidden" type="button" id="btn-retry-select">Escolher outro arquivo</button>
+          </div>
+        </div>
+
+        <div class="result hidden" id="upload-result" aria-live="polite">
+          <div class="result-head">
+            <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+            <div>
+              <h2>Arquivo enviado!</h2>
+              <div class="muted" style="font-size:.85rem" id="upload-result-meta"></div>
+            </div>
+          </div>
+          <span class="label">Link</span>
+          <div class="copy-field">
+            <input class="field" id="file-link" readonly>
+            <button class="btn" type="button" id="btn-copy-file-link" data-copy-target="#file-link" data-copy-msg="Link copiado!">Copiar</button>
+          </div>
+          <span class="label">MD5</span>
+          <div class="copy-field">
+            <input class="field" id="file-md5" readonly>
+            <button class="btn" type="button" id="btn-copy-file-md5" data-copy-target="#file-md5" data-copy-msg="MD5 copiado!">Copiar</button>
+          </div>
+          <div class="btn-row" style="margin-top:14px">
+            <a class="btn btn-primary" id="btn-open-file" href="#">Abrir página</a>
+            <a class="btn" id="btn-download-file" href="#">Baixar</a>
+            <button class="btn btn-ghost" type="button" id="btn-new-upload">Enviar outro</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    vpendrive<span class="sep">•</span>retenção: <b data-cfg="retention">3 dias</b><span class="sep">•</span>limite: <b data-cfg="maxFile">15 GB</b><span class="sep">•</span>armazenamento: <b data-cfg="usedStorage">0 B</b> (<b data-cfg="totalFiles">0</b> arquivos no total)
+  </footer>
+
+  <div id="toast-root" aria-live="polite"></div>
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

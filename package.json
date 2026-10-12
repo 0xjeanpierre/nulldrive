@@ -1,0 +1,20 @@
+{
+  "name": "vpendrive",
+  "version": "1.0.0",
+  "description": "Clone simples do Pastebin com upload de arquivos .zip/.7z (até 15 GB) e expiração configurável.",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "express": "^4.21.2",
+    "nanoid": "^5.0.9"
+  }
+}

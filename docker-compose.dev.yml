@@ -1,0 +1,10 @@
+# Uso: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+services:
+  app:
+    environment:
+      NODE_ENV: development
+    command: ["node", "--watch", "src/server.js"]
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    restart: "no"

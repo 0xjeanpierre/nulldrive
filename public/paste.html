@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paste – vpendrive</title>
+  <meta name="description" content="Visualize, copie ou baixe este texto compartilhado no vpendrive, com hash MD5 para verificação.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0a0c13">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="site-header container">
+    <a class="brand" href="/" id="brand-link" aria-label="vpendrive – início">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9z"/><rect x="6" y="7" width="12" height="14" rx="3"/><path d="M10 12h4M10 16h4"/></svg>
+      </span>
+      vpendrive
+    </a>
+    <a class="btn btn-primary btn-sm" href="/" id="btn-new">+ Novo</a>
+  </header>
+
+  <main class="container">
+    <!-- Carregando -->
+    <section class="card state-card" id="state-loading">
+      <div class="spinner"></div>
+      <h1>Carregando paste…</h1>
+    </section>
+
+    <!-- Erro -->
+    <section class="card state-card hidden" id="state-error">
+      <div class="state-code" id="error-code">404</div>
+      <h1 id="error-title">Paste não encontrado</h1>
+      <p class="muted" id="error-text">O link pode ter expirado ou nunca ter existido.</p>
+      <a class="btn btn-primary" href="/" id="btn-error-home">Criar um novo paste</a>
+    </section>
+
+    <!-- Paste -->
+    <article class="card view-card hidden" id="paste-view">
+      <div class="view-head">
+        <div>
+          <h1 id="paste-title">Paste</h1>
+          <div class="meta">
+            <span>📅 <b id="meta-created">—</b></span>
+            <span>📄 <b id="meta-size">—</b></span>
+            <span>🔢 <b id="meta-lines">—</b></span>
+            <span>⏳ expira em <b class="countdown" id="meta-countdown">—</b></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hash-box">
+        <span class="hash-tag">MD5</span>
+        <code class="hash-value" id="paste-md5">—</code>
+        <button class="btn btn-sm" type="button" id="btn-copy-md5" data-copy-target="#paste-md5" data-copy-msg="MD5 copiado!">Copiar</button>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn-sm" type="button" id="btn-copy-text">📋 Copiar texto</button>
+        <button class="btn btn-sm" type="button" id="btn-copy-link">🔗 Copiar link</button>
+        <a class="btn btn-sm" id="btn-raw" href="#" target="_blank" rel="noopener">👁 Ver raw</a>
+        <a class="btn btn-sm btn-primary" id="btn-download-txt" href="#">⬇ Baixar .txt</a>
+        <a class="btn btn-sm" id="btn-download-md5" href="#">⬇ Baixar .md5</a>
+      </div>
+
+      <div class="code-view" id="code-view">
+        <pre class="gutter" id="gutter" aria-hidden="true"></pre>
+        <pre class="code" id="code" tabindex="0"></pre>
+      </div>
+
+      <section class="verify" aria-labelledby="verify-title">
+        <h2 id="verify-title">Verificar integridade do .txt baixado</h2>
+        <div class="cmd"><span class="cmd-os">Windows</span><code id="cmd-win"></code><button class="btn btn-sm" type="button" id="btn-copy-cmd-win" data-copy-target="#cmd-win">Copiar</button></div>
+        <div class="cmd"><span class="cmd-os">Linux/Mac</span><code id="cmd-linux"></code><button class="btn btn-sm" type="button" id="btn-copy-cmd-linux" data-copy-target="#cmd-linux">Copiar</button></div>
+        <div class="cmd"><span class="cmd-os">Com .md5</span><code id="cmd-check"></code><button class="btn btn-sm" type="button" id="btn-copy-cmd-check" data-copy-target="#cmd-check">Copiar</button></div>
+      </section>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    vpendrive<span class="sep">•</span>retenção: <b data-cfg="retention">3 dias</b><span class="sep">•</span>limite: <b data-cfg="maxFile">15 GB</b><span class="sep">•</span>armazenamento: <b data-cfg="usedStorage">0 B</b> (<b data-cfg="totalFiles">0</b> arquivos no total)
+  </footer>
+
+  <div id="toast-root" aria-live="polite"></div>
+  <script type="module" src="/js/paste.js"></script>
+</body>
+</html>
