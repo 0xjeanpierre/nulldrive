@@ -12,7 +12,7 @@ Criar um site estilo **Pastebin** chamado **nulldrive**, com código na pasta
 com duas funções:
 
 1. **Colar texto** → gera link compartilhável, com download em `.txt` e hash **MD5**.
-2. **Upload de arquivos** `.zip` / `.7z` até **15 GB**, que expiram após **3 dias**
+2. **Upload de arquivos** `.zip` / `.7z` até **1 GB**, que expiram após **3 dias**
    (prazo configurável).
 
 **Fora do escopo nesta fase:** SSL/TLS, HTTPS, login, autenticação, captcha, rate-limit,
@@ -43,7 +43,7 @@ criptografia. O foco é **funcionar**.
 | Container   | `node:20-bookworm-slim` (multi-stage) + Docker Compose         |
 | Persistência| Volume `nulldrive-storage` → `/app/storage`; `./config` → `/app/config` |
 
-> Por que chunks? Um único POST de 15 GB falha com facilidade (timeout, memória, proxy).
+> Por que chunks? Um único POST de 1 GB falha com facilidade (timeout, memória, proxy).
 > Fatiar em partes de ~50 MB torna o envio estável e permite barra de progresso real.
 
 ---
@@ -102,7 +102,7 @@ nulldrive/
   "host": "0.0.0.0",
   "storageDir": "/app/storage",
   "retentionDays": 3,
-  "maxFileSizeBytes": 16106127360,
+  "maxFileSizeBytes": 1073741824,
   "chunkSizeBytes": 52428800,
   "allowedExtensions": [".zip", ".7z"],
   "maxPasteSizeBytes": 10485760,
@@ -112,7 +112,7 @@ nulldrive/
 ```
 
 Regras:
-- `15 GB = 15 * 1024^3 = 16106127360` bytes.
+- `1 GB = 1 * 1024^3 = 1073741824` bytes.
 - O caminho do arquivo vem de `CONFIG_PATH` (no container: `/app/config/config.json`;
   fallback local: `./config/config.json`). Se o arquivo **não existir**, criá-lo com os
   valores padrão acima (o bind mount `./config` pode estar vazio).
@@ -197,7 +197,7 @@ O conteúdo do paste fica em `storage/pastes/<id>.txt` (não no banco).
 
 ---
 
-## 6. Feature 2 – Upload de arquivos (.zip / .7z, até 15 GB)
+## 6. Feature 2 – Upload de arquivos (.zip / .7z, até 1 GB)
 
 ### Fluxo em chunks
 1. **Init** – `POST /api/uploads/init`
@@ -277,7 +277,7 @@ O conteúdo do paste fica em `storage/pastes/<id>.txt` (não no banco).
 - Home com **duas abas**: "📋 Colar texto" e "📦 Enviar arquivo".
 - Microanimações: hover em botões, transição entre abas, área de drop que "pulsa" ao arrastar,
   toast de "Copiado!".
-- Mostrar no rodapé: retenção atual (lida de `GET /api/config/public`) e limite de 15 GB.
+- Mostrar no rodapé: retenção atual (lida de `GET /api/config/public`) e limite de 1 GB.
 - Responsivo (funciona no celular).
 - SEO básico: `<title>`, `<meta name="description">`, um único `<h1>` por página,
   HTML semântico, IDs únicos em elementos interativos.
@@ -370,7 +370,7 @@ Todos os testes rodam contra o container (`http://localhost:8000`).
 - [ ] Upload de `.zip` pequeno funciona e o MD5 do download bate com o original.
 - [ ] Upload de `.7z` funciona.
 - [ ] Arquivo `.rar` ou `.txt` renomeado para `.zip` é rejeitado (magic bytes).
-- [ ] Arquivo declarado > 15 GB é rejeitado no cliente e no servidor.
+- [ ] Arquivo declarado > 1 GB é rejeitado no cliente e no servidor.
 - [ ] Upload grande (gerar arquivo de teste de ~2 GB) não estoura memória do Node
       (observar uso de RAM estável).
 - [ ] Interromper rede/recarregar no meio e **retomar** o upload.

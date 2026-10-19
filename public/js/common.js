@@ -34,7 +34,7 @@ export const TRANSLATIONS = {
 
     'home.pageTitle': 'nulldrive – Compartilhe textos e arquivos .zip/.7z',
     'home.intro':
-      'Cole um texto ou envie um <b>.zip</b> / <b>.7z</b> de até <b data-cfg="maxFile">15 GB</b>. Você recebe um link com hash MD5 para conferir a integridade.',
+      'Cole um texto ou envie um <b>.zip</b> / <b>.7z</b> de até <b data-cfg="maxFile">1 GB</b>. Você recebe um link com hash MD5 para conferir a integridade.',
     'home.tabText': '📋 Colar texto',
     'home.tabFile': '📦 Enviar arquivo',
     'home.pasteTitleLabel': 'Título',
@@ -58,7 +58,7 @@ export const TRANSLATIONS = {
     'home.toastPendingDiscarded': 'Upload pendente descartado',
     'home.dropTitle': 'Arraste o arquivo aqui',
     'home.dropSub': 'ou clique para escolher',
-    'home.chipUpTo': 'até <span data-cfg="maxFile">15 GB</span>',
+    'home.chipUpTo': 'até <span data-cfg="maxFile">1 GB</span>',
     'home.chipResumable': 'retomável',
     'home.statProgress': 'Progresso',
     'home.statSent': 'Enviado',
@@ -154,7 +154,7 @@ export const TRANSLATIONS = {
 
     'home.pageTitle': 'nulldrive – Share text and .zip/.7z files',
     'home.intro':
-      'Paste text or upload a <b>.zip</b> / <b>.7z</b> file up to <b data-cfg="maxFile">15 GB</b>. You get a shareable link with an MD5 hash to verify integrity.',
+      'Paste text or upload a <b>.zip</b> / <b>.7z</b> file up to <b data-cfg="maxFile">1 GB</b>. You get a shareable link with an MD5 hash to verify integrity.',
     'home.tabText': '📋 Paste text',
     'home.tabFile': '📦 Upload file',
     'home.pasteTitleLabel': 'Title',
@@ -178,7 +178,7 @@ export const TRANSLATIONS = {
     'home.toastPendingDiscarded': 'Pending upload discarded',
     'home.dropTitle': 'Drag & drop your file here',
     'home.dropSub': 'or click to browse',
-    'home.chipUpTo': 'up to <span data-cfg="maxFile">15 GB</span>',
+    'home.chipUpTo': 'up to <span data-cfg="maxFile">1 GB</span>',
     'home.chipResumable': 'resumable',
     'home.statProgress': 'Progress',
     'home.statSent': 'Uploaded',
@@ -511,7 +511,7 @@ export function getPublicConfig(force = false) {
   if (force || !publicConfigPromise) {
     publicConfigPromise = api('/api/config/public').catch(() => ({
       retentionDays: 3,
-      maxFileSizeBytes: 15 * 1024 ** 3,
+      maxFileSizeBytes: 1 * 1024 ** 3,
       chunkSizeBytes: 50 * 1024 ** 2,
       allowedExtensions: ['.zip', '.7z'],
       maxPasteSizeBytes: 10 * 1024 ** 2,

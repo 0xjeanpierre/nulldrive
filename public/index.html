@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>nulldrive – Compartilhe textos e arquivos .zip/.7z</title>
-  <meta name="description" content="Cole textos ou envie arquivos .zip e .7z de até 15 GB e compartilhe por link. Hash MD5, download .txt e expiração automática.">
+  <meta name="description" content="Cole textos ou envie arquivos .zip e .7z de até 1 GB e compartilhe por link. Hash MD5, download .txt e expiração automática.">
   <meta name="theme-color" content="#16181d">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <script>
@@ -40,7 +40,7 @@
     <div class="intro-box">
       <h1 class="intro-title">Null Drive</h1>
       <p class="intro-text" data-i18n-html="home.intro">
-        Cole um texto ou envie um <b>.zip</b> / <b>.7z</b> de até <b data-cfg="maxFile">15 GB</b>. Você recebe um link com hash MD5 para conferir a integridade.
+        Cole um texto ou envie um <b>.zip</b> / <b>.7z</b> de até <b data-cfg="maxFile">1 GB</b>. Você recebe um link com hash MD5 para conferir a integridade.
       </p>
     </div>
 
@@ -109,7 +109,7 @@
           <span class="drop-sub" data-i18n="home.dropSub">ou clique para escolher</span>
           <span class="chips">
             <span class="chip" data-cfg="exts">.zip · .7z</span>
-            <span class="chip" data-i18n-html="home.chipUpTo">até <span data-cfg="maxFile">15 GB</span></span>
+            <span class="chip" data-i18n-html="home.chipUpTo">até <span data-cfg="maxFile">1 GB</span></span>
             <span class="chip" data-i18n="home.chipResumable">retomável</span>
           </span>
           <input type="file" id="file-input" accept=".zip,.7z" hidden>
@@ -170,7 +170,7 @@
   </main>
 
   <footer class="site-footer">
-    nulldrive<span class="sep">•</span><span data-i18n="footer.retention">retenção:</span> <b data-cfg="retention">3 dias</b><span class="sep">•</span><span data-i18n="footer.limit">limite:</span> <b data-cfg="maxFile">15 GB</b><span class="sep">•</span><span data-i18n="footer.storage">armazenamento:</span> <b data-cfg="usedStorage">0 B</b> (<b data-cfg="totalFiles">0</b> <span data-i18n="footer.totalItems">arquivos no total</span>)
+    nulldrive<span class="sep">•</span><span data-i18n="footer.retention">retenção:</span> <b data-cfg="retention">3 dias</b><span class="sep">•</span><span data-i18n="footer.limit">limite:</span> <b data-cfg="maxFile">1 GB</b><span class="sep">•</span><span data-i18n="footer.storage">armazenamento:</span> <b data-cfg="usedStorage">0 B</b> (<b data-cfg="totalFiles">0</b> <span data-i18n="footer.totalItems">arquivos no total</span>)
   </footer>
 
   <div id="toast-root" aria-live="polite"></div>

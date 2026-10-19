@@ -190,7 +190,7 @@ $('#btn-discard-pending').addEventListener('click', async () => {
 
 function validateFile(file) {
   const allowed = cfg?.allowedExtensions ?? ['.zip', '.7z'];
-  const max = cfg?.maxFileSizeBytes ?? 15 * 1024 ** 3;
+  const max = cfg?.maxFileSizeBytes ?? 1 * 1024 ** 3;
   if (!allowed.includes(getExtension(file.name))) {
     return t('home.errTypeNotAllowed', { allowed: allowed.join(t('common.or')) });
   }

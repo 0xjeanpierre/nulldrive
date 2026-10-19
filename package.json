@@ -1,7 +1,7 @@
 {
   "name": "nulldrive",
   "version": "1.0.0",
-  "description": "Clone simples do Pastebin com upload de arquivos .zip/.7z (até 15 GB) e expiração configurável.",
+  "description": "Clone simples do Pastebin com upload de arquivos .zip/.7z (até 1 GB) e expiração configurável.",
   "private": true,
   "type": "module",
   "main": "src/server.js",

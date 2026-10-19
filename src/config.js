@@ -8,7 +8,7 @@ export const DEFAULTS = Object.freeze({
   host: '0.0.0.0',
   storageDir: './storage',
   retentionDays: 3,
-  maxFileSizeBytes: 15 * 1024 ** 3, // 15 GB
+  maxFileSizeBytes: 1 * 1024 ** 3, // 1 GB
   chunkSizeBytes: 50 * 1024 ** 2, // 50 MB
   allowedExtensions: ['.zip', '.7z'],
   maxPasteSizeBytes: 10 * 1024 ** 2, // 10 MB

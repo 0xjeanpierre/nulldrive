@@ -20,7 +20,7 @@ services:
       # Descomente para FORÇAR via env (tem prioridade sobre config.json e
       # sobre alterações feitas por PUT /api/admin/config após reiniciar):
       # RETENTION_DAYS: ${RETENTION_DAYS:-3}
-      # MAX_FILE_SIZE_BYTES: ${MAX_FILE_SIZE_BYTES:-16106127360}
+      # MAX_FILE_SIZE_BYTES: ${MAX_FILE_SIZE_BYTES:-1073741824}
       # CHUNK_SIZE_BYTES: ${CHUNK_SIZE_BYTES:-52428800}
       # CLEANUP_INTERVAL_MINUTES: ${CLEANUP_INTERVAL_MINUTES:-60}
     volumes:

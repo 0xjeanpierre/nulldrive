@@ -3,7 +3,7 @@
   "host": "0.0.0.0",
   "storageDir": "./storage",
   "retentionDays": 3,
-  "maxFileSizeBytes": 16106127360,
+  "maxFileSizeBytes": 1073741824,
   "chunkSizeBytes": 52428800,
   "allowedExtensions": [".zip", ".7z"],
   "maxPasteSizeBytes": 10485760,

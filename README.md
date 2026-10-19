@@ -1,6 +1,6 @@
 # nulldrive 📦📋
 
-Clone moderno e minimalista do Pastebin com suporte a compartilhamento de textos e uploads de grandes arquivos compactados (`.zip` e `.7z`) até **15 GB**, com expiração automática configurável (padrão 3 dias) e cálculo de hash **MD5**.
+Clone moderno e minimalista do Pastebin com suporte a compartilhamento de textos e uploads de grandes arquivos compactados (`.zip` e `.7z`) até **1 GB**, com expiração automática configurável (padrão 3 dias) e cálculo de hash **MD5**.
 
 ---
 
@@ -14,7 +14,7 @@ Clone moderno e minimalista do Pastebin com suporte a compartilhamento de textos
 
 2. **Upload de Arquivos Grandes**
    - Suporte exclusivo a arquivos compactados: `.zip` e `.7z`.
-   - Limite máximo: **15 GB**.
+   - Limite máximo: **1 GB**.
    - Envio fatiado em **chunks de 50 MB** com streaming direto em disco (sem estourar a memória RAM do servidor).
    - Validação antecipada por **Magic Bytes** (impede que arquivos renomeados burlem a validação).
    - Suporte a **Pausar**, **Retomar** e recuperação automática em caso de instabilidade de rede ou recarregamento de página.
@@ -72,7 +72,7 @@ A configuração fica salva em [`config/config.json`](file:///c:/Users/jpos/Docu
   "host": "0.0.0.0",
   "storageDir": "/app/storage",
   "retentionDays": 3,
-  "maxFileSizeBytes": 16106127360,
+  "maxFileSizeBytes": 1073741824,
   "chunkSizeBytes": 52428800,
   "allowedExtensions": [".zip", ".7z"],
   "maxPasteSizeBytes": 10485760,

@@ -125,7 +125,7 @@ router.post(
     const chunkSize = config.chunkSizeBytes;
     const totalChunks = Math.ceil(n / chunkSize);
     // Os chunks são gravados direto na posição final deste arquivo (sem precisar concatenar depois,
-    // o que dobraria o uso de disco em arquivos de 15 GB).
+    // o que dobraria o uso de disco em arquivos de 1 GB).
     await fs.promises.writeFile(partPath(id), '');
     stmts.insert.run({
       id,
