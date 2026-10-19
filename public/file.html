@@ -1,39 +1,53 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Download – nulldrive</title>
   <meta name="description" content="Baixe este arquivo compartilhado no nulldrive e confira a integridade com o hash MD5.">
   <meta name="robots" content="noindex">
-  <meta name="theme-color" content="#0a0c13">
+  <meta name="theme-color" content="#16181d">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem('nulldrive.theme') === 'light' ? 'light' : 'dark';
+      document.documentElement.lang = localStorage.getItem('nulldrive.lang') === 'en-US' ? 'en-US' : 'pt-BR';
+    } catch {}
+  </script>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="bg-glow" aria-hidden="true"></div>
 
   <header class="site-header container">
-    <a class="brand" href="/" id="brand-link" aria-label="nulldrive – início">
+    <a class="brand" href="/" id="brand-link" aria-label="nulldrive – início" data-i18n-aria="brand.aria">
       <span class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9z"/><rect x="6" y="7" width="12" height="14" rx="3"/><path d="M10 12h4M10 16h4"/></svg>
       </span>
       nulldrive
     </a>
-    <a class="btn btn-primary btn-sm" href="/#arquivo" id="btn-new">+ Enviar arquivo</a>
+    <div class="header-actions">
+      <a class="btn btn-primary btn-sm" href="/#files" id="btn-new" data-i18n="header.uploadFile">+ Enviar arquivo</a>
+      <a class="btn btn-sm" href="/docs" id="btn-docs" data-i18n="header.apiDocs">API Docs</a>
+      <select class="lang-select" id="lang-select" aria-label="Alternar idioma (PT-BR / EN-US)" data-i18n-aria="lang.toggleAria">
+        <option value="pt-BR" selected>PT-BR</option>
+        <option value="en-US">EN-US</option>
+      </select>
+      <button class="theme-switch" type="button" id="btn-theme" role="switch" aria-checked="false" aria-label="Alternar tema (Dim / White)" data-i18n-aria="theme.toggleAria"></button>
+    </div>
   </header>
 
   <main class="container narrow">
     <section class="card state-card" id="state-loading">
       <div class="spinner"></div>
-      <h1>Carregando arquivo…</h1>
+      <h1 data-i18n="file.loading">Carregando arquivo…</h1>
     </section>
 
     <section class="card state-card hidden" id="state-error">
       <div class="state-code" id="error-code">404</div>
-      <h1 id="error-title">Arquivo não encontrado</h1>
-      <p class="muted" id="error-text">O link pode ter expirado ou nunca ter existido.</p>
-      <a class="btn btn-primary" href="/#arquivo" id="btn-error-home">Enviar um arquivo</a>
+      <h1 id="error-title" data-i18n="file.errNotFoundTitle">Arquivo não encontrado</h1>
+      <p class="muted" id="error-text" data-i18n="file.errNotFoundText">O link pode ter expirado, ainda estar em envio ou nunca ter existido.</p>
+      <a class="btn btn-primary" href="/#files" id="btn-error-home" data-i18n="file.uploadNewBtn">Enviar um arquivo</a>
     </section>
 
     <article class="card view-card hidden" id="file-view">
@@ -51,33 +65,33 @@
       <div class="hash-box">
         <span class="hash-tag">MD5</span>
         <code class="hash-value" id="file-md5">—</code>
-        <button class="btn btn-sm" type="button" id="btn-copy-md5" data-copy-target="#file-md5" data-copy-msg="MD5 copiado!">Copiar</button>
+        <button class="btn btn-sm" type="button" id="btn-copy-md5" data-copy-target="#file-md5" data-i18n-copy-msg="common.md5Copied" data-i18n="common.copy">Copiar</button>
       </div>
 
       <div class="meta" style="margin-top:0">
-        <span>⏳ expira em <b class="countdown" id="meta-countdown">—</b></span>
+        <span>⏳ <span data-i18n="common.expiresIn">expira em</span> <b class="countdown" id="meta-countdown">—</b></span>
       </div>
 
       <div class="download-cta">
         <a class="btn btn-primary btn-lg" id="btn-download" href="#">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>
-          Baixar arquivo
+          <span data-i18n="file.downloadFileBtn">Baixar arquivo</span>
         </a>
-        <a class="btn btn-lg" id="btn-download-md5" href="#">Baixar .md5</a>
-        <button class="btn btn-lg btn-ghost" type="button" id="btn-copy-link">🔗 Copiar link</button>
+        <a class="btn btn-lg" id="btn-download-md5" href="#" data-i18n="file.downloadMd5Btn">Baixar .md5</a>
+        <button class="btn btn-lg btn-ghost" type="button" id="btn-copy-link" data-i18n="file.copyLinkBtn">🔗 Copiar link</button>
       </div>
 
       <section class="verify" aria-labelledby="verify-title">
-        <h2 id="verify-title">Verificar integridade após baixar</h2>
-        <div class="cmd"><span class="cmd-os">Windows</span><code id="cmd-win"></code><button class="btn btn-sm" type="button" id="btn-copy-cmd-win" data-copy-target="#cmd-win">Copiar</button></div>
-        <div class="cmd"><span class="cmd-os">Linux/Mac</span><code id="cmd-linux"></code><button class="btn btn-sm" type="button" id="btn-copy-cmd-linux" data-copy-target="#cmd-linux">Copiar</button></div>
-        <div class="cmd"><span class="cmd-os">Com .md5</span><code id="cmd-check"></code><button class="btn btn-sm" type="button" id="btn-copy-cmd-check" data-copy-target="#cmd-check">Copiar</button></div>
+        <h2 id="verify-title" data-i18n="file.verifyTitle">Verificar integridade após baixar</h2>
+        <div class="cmd"><span class="cmd-os">Windows</span><code id="cmd-win"></code><button class="btn btn-sm" type="button" id="btn-copy-cmd-win" data-copy-target="#cmd-win" data-i18n="common.copy">Copiar</button></div>
+        <div class="cmd"><span class="cmd-os">Linux/Mac</span><code id="cmd-linux"></code><button class="btn btn-sm" type="button" id="btn-copy-cmd-linux" data-copy-target="#cmd-linux" data-i18n="common.copy">Copiar</button></div>
+        <div class="cmd"><span class="cmd-os" data-i18n="common.withMd5">Com .md5</span><code id="cmd-check"></code><button class="btn btn-sm" type="button" id="btn-copy-cmd-check" data-copy-target="#cmd-check" data-i18n="common.copy">Copiar</button></div>
       </section>
     </article>
   </main>
 
   <footer class="site-footer">
-    nulldrive<span class="sep">•</span>retenção: <b data-cfg="retention">3 dias</b><span class="sep">•</span>limite: <b data-cfg="maxFile">15 GB</b><span class="sep">•</span>armazenamento: <b data-cfg="usedStorage">0 B</b> (<b data-cfg="totalFiles">0</b> arquivos no total)
+    nulldrive<span class="sep">•</span><span data-i18n="footer.retention">retenção:</span> <b data-cfg="retention">3 dias</b><span class="sep">•</span><span data-i18n="footer.limit">limite:</span> <b data-cfg="maxFile">15 GB</b><span class="sep">•</span><span data-i18n="footer.storage">armazenamento:</span> <b data-cfg="usedStorage">0 B</b> (<b data-cfg="totalFiles">0</b> <span data-i18n="footer.totalItems">arquivos no total</span>)
   </footer>
 
   <div id="toast-root" aria-live="polite"></div>

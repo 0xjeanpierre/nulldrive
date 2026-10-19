@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>API Docs (Swagger) – nulldrive</title>
+  <meta name="description" content="Documentação interativa Swagger / OpenAPI 3.0 da API do Null Drive.">
+  <meta name="theme-color" content="#16181d">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem('nulldrive.theme') === 'light' ? 'light' : 'dark';
+      document.documentElement.lang = localStorage.getItem('nulldrive.lang') === 'en-US' ? 'en-US' : 'pt-BR';
+    } catch {}
+  </script>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="site-header container">
+    <a class="brand" href="/" id="brand-link" aria-label="nulldrive – início" data-i18n-aria="brand.aria">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9z"/><rect x="6" y="7" width="12" height="14" rx="3"/><path d="M10 12h4M10 16h4"/></svg>
+      </span>
+      nulldrive
+    </a>
+    <div class="header-actions">
+      <a class="btn btn-sm" href="/" id="btn-home" data-i18n="docs.backHome">← Início</a>
+      <a class="btn btn-sm" href="/api/openapi.json" target="_blank" rel="noopener" id="btn-openapi-json" data-i18n="docs.openJson">OpenAPI JSON</a>
+      <select class="lang-select" id="lang-select" aria-label="Alternar idioma (PT-BR / EN-US)" data-i18n-aria="lang.toggleAria">
+        <option value="pt-BR" selected>PT-BR</option>
+        <option value="en-US">EN-US</option>
+      </select>
+      <button class="theme-switch" type="button" id="btn-theme" role="switch" aria-checked="false" aria-label="Alternar tema (Dim / White)" data-i18n-aria="theme.toggleAria"></button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card swagger-card">
+      <div id="swagger-ui"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    nulldrive<span class="sep">•</span><span data-i18n="footer.retention">retenção:</span> <b data-cfg="retention">3 dias</b><span class="sep">•</span><span data-i18n="footer.limit">limite:</span> <b data-cfg="maxFile">15 GB</b><span class="sep">•</span><span data-i18n="footer.storage">armazenamento:</span> <b data-cfg="usedStorage">0 B</b> (<b data-cfg="totalFiles">0</b> <span data-i18n="footer.totalItems">arquivos no total</span>)
+  </footer>
+
+  <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+  <script type="module">
+    import { getLang, initPreferences, t } from './js/common.js';
+
+    initPreferences();
+    document.title = t('docs.pageTitle');
+
+    function mountSwagger() {
+      const lang = getLang();
+      const specUrl = `/api/openapi.json?lang=${encodeURIComponent(lang)}`;
+      document.getElementById('btn-openapi-json').href = specUrl;
+      if (window.SwaggerUIBundle) {
+        window.ui = window.SwaggerUIBundle({
+          url: specUrl,
+          dom_id: '#swagger-ui',
+          deepLinking: true,
+          displayRequestDuration: true,
+          filter: true,
+          tryItOutEnabled: true,
+        });
+      }
+    }
+
+    mountSwagger();
+    window.addEventListener('langchange', () => {
+      document.title = t('docs.pageTitle');
+      mountSwagger();
+    });
+  </script>
+</body>
+</html>
+

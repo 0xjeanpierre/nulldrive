@@ -74,8 +74,8 @@ function fileDto(row) {
     md5: row.md5,
     createdAt: row.created_at,
     expiresAt: row.expires_at,
-    url: `/f/${row.id}`,
-    downloadUrl: `/f/${row.id}/download`,
+    url: `/files/${row.id}`,
+    downloadUrl: `/files/${row.id}/download`,
   };
 }
 
@@ -290,7 +290,7 @@ router.get('/api/files/:id', (req, res, next) => {
   }
 });
 
-router.get('/f/:id/download', (req, res, next) => {
+router.get(['/files/:id/download', '/f/:id/download'], (req, res, next) => {
   try {
     const row = loadReadyFile(req.params.id);
     // res.download usa `send`: Content-Length, Range/206, ETag e Last-Modified
@@ -302,7 +302,7 @@ router.get('/f/:id/download', (req, res, next) => {
   }
 });
 
-router.get('/f/:id/download.md5', (req, res, next) => {
+router.get(['/files/:id/download.md5', '/f/:id/download.md5'], (req, res, next) => {
   try {
     const row = loadReadyFile(req.params.id);
     res.attachment(`${row.original_name}.md5`);
@@ -313,7 +313,11 @@ router.get('/f/:id/download.md5', (req, res, next) => {
   }
 });
 
-router.get('/f/:id', (req, res) => {
+router.get('/files', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
+});
+
+router.get(['/files/:id', '/f/:id'], (req, res) => {
   let status = 200;
   try {
     loadReadyFile(req.params.id);

@@ -1,4 +1,4 @@
-import { api } from './common.js';
+import { api, t } from './common.js';
 
 const STORAGE_KEY = 'nulldrive.pendingUpload';
 const FATAL_STATUS = new Set([400, 404, 409, 410, 413, 415, 507]);
@@ -108,7 +108,7 @@ export class ChunkUploader {
         this.chunkSize = status.chunkSize;
         this.totalChunks = status.totalChunks;
         status.received.forEach((i) => this.done.add(i));
-        this.onNotice(`Retomando: ${status.received.length} de ${status.totalChunks} partes já estavam no servidor.`);
+        this.onNotice(t('uploader.resumingNotice', { done: status.received.length, total: status.totalChunks }));
       } else {
         const init = await api('/api/uploads/init', {
           method: 'POST',
@@ -189,7 +189,15 @@ export class ChunkUploader {
       } catch (err) {
         if (err.name === 'AbortError' || err.fatal || attempt >= this.maxRetries) throw err;
         const delay = Math.min(30000, 1000 * 2 ** attempt);
-        this.onNotice(`Falha na parte ${idx + 1} (${err.message}). Nova tentativa ${attempt + 1}/${this.maxRetries} em ${delay / 1000}s…`);
+        this.onNotice(
+          t('uploader.retryNotice', {
+            part: idx + 1,
+            err: err.message,
+            attempt: attempt + 1,
+            max: this.maxRetries,
+            sec: delay / 1000,
+          })
+        );
         for (let w = 0; w < delay; w += 250) {
           if (this.paused || this.cancelled || this.fatal) throw abortError();
           await wait(250);
@@ -228,7 +236,7 @@ export class ChunkUploader {
       };
       xhr.onerror = () => {
         entry.loaded = 0;
-        reject(new Error('falha de rede'));
+        reject(new Error(t('uploader.networkError')));
       };
       xhr.onabort = () => {
         entry.loaded = 0;

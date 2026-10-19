@@ -25,6 +25,12 @@ Clone moderno e minimalista do Pastebin com suporte a compartilhamento de textos
    - Rotina periódica de limpeza automática (apaga itens vencidos, resíduos órfãos e uploads abandonados).
    - Ajuste em tempo de execução via API administrativa sem necessidade de reiniciar.
 
+4. **Interface, Temas, Idiomas e Documentação Swagger**
+   - **Temas**: suporte a **Dark Mode (Color Dim)** e **White Mode (Light)** com alternância no cabeçalho.
+   - **Idiomas (i18n)**: interface e documentação disponíveis em **Português (`pt-BR`)** e **Inglês (`en-US`)**.
+   - **Rotas padronizadas em inglês**: `/pastes/:id`, `/files/:id`, `/#files`, `/docs`.
+   - **API Swagger / OpenAPI 3.0**: documentação interativa disponível em **[http://localhost:8000/docs](http://localhost:8000/docs)** (especificação JSON em `/api/openapi.json`).
+
 ---
 
 ## 🛠️ Como Executar com Docker Compose (Recomendado)
@@ -35,7 +41,7 @@ O projeto foi totalmente projetado para rodar isolado em Docker. Não é necess�
 ```powershell
 docker compose up -d --build
 ```
-Acesse a aplicação no navegador em: **[http://localhost:8000](http://localhost:8000)**.
+Acesse a aplicação no navegador em: **[http://localhost:8000](http://localhost:8000)** (e a documentação Swagger em **[http://localhost:8000/docs](http://localhost:8000/docs)**).
 
 Para acompanhar os logs do servidor:
 ```powershell

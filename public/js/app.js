@@ -8,12 +8,18 @@ import {
   formatDate,
   formatDuration,
   getExtension,
+  getLang,
   getPublicConfig,
+  initPreferences,
+  t,
   toast,
 } from './common.js';
 import { ChunkUploader, getPending, clearPending } from './uploader.js';
 
 const $ = (sel) => document.querySelector(sel);
+
+initPreferences();
+document.title = t('home.pageTitle');
 
 let cfg;
 fillConfigText().then((c) => {
@@ -34,7 +40,7 @@ function selectTab(name, focus = false) {
     $(`#${btn.getAttribute('aria-controls')}`).hidden = !active;
     if (active && focus) btn.focus();
   }
-  history.replaceState(null, '', name === 'file' ? '#arquivo' : location.pathname);
+  history.replaceState(null, '', name === 'file' ? '#files' : location.pathname === '/files' ? '/' : location.pathname);
 }
 tabs.addEventListener('click', (e) => {
   const btn = e.target.closest('[role="tab"]');
@@ -45,7 +51,9 @@ tabs.addEventListener('keydown', (e) => {
     selectTab(tabs.dataset.active === 'text' ? 'file' : 'text', true);
   }
 });
-if (location.hash === '#arquivo') selectTab('file');
+if (location.hash === '#files' || location.hash === '#file' || location.hash === '#arquivo' || location.pathname === '/files') {
+  selectTab('file');
+}
 
 /* ===================== Paste ===================== */
 const form = $('#paste-form');
@@ -62,7 +70,11 @@ function updateCounter() {
     const text = contentEl.value;
     const bytes = encoder.encode(text).length;
     const max = cfg?.maxPasteSizeBytes ?? 10 * 1024 ** 2;
-    counterEl.textContent = `${text.length.toLocaleString('pt-BR')} caracteres · ${formatBytes(bytes)} de ${formatBytes(max, 0)}`;
+    counterEl.textContent = t('home.counter', {
+      chars: text.length.toLocaleString(getLang()),
+      size: formatBytes(bytes),
+      max: formatBytes(max, 0),
+    });
     const over = bytes > max;
     counterEl.classList.toggle('over', over);
     createBtn.disabled = over;
@@ -88,7 +100,7 @@ titleEl.addEventListener('keydown', (e) => {
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!contentEl.value.trim()) {
-    toast('Cole algum texto primeiro', 'error');
+    toast(t('home.toastEmptyPaste'), 'error');
     contentEl.focus();
     return;
   }
@@ -105,7 +117,7 @@ form.addEventListener('submit', async (e) => {
     $('#btn-download-paste-md5').href = `${paste.url}/download.md5`;
     form.classList.add('hidden');
     $('#paste-result').classList.remove('hidden');
-    toast('Paste criado!');
+    toast(t('home.toastPasteCreated'));
     fillConfigText(true);
   } catch (err) {
     toast(err.message, 'error');
@@ -136,6 +148,7 @@ const btnRetrySelect = $('#btn-retry-select');
 const resumeBanner = $('#resume-banner');
 let uploader = null;
 let pending = null;
+let lastUploadedFile = null;
 
 function setStatus(text, kind = '') {
   statusEl.textContent = text;
@@ -154,9 +167,9 @@ async function checkPending() {
   if (!pending) return;
   try {
     const s = await api(`/api/uploads/${pending.uploadId}/status`);
-    if (s.status !== 'uploading') throw new Error('não está mais pendente');
+    if (s.status !== 'uploading') throw new Error('not pending');
     const pct = s.size ? Math.floor((s.receivedBytes / s.size) * 100) : 0;
-    $('#resume-text').textContent = `⚠ Upload de "${pending.name}" pausado em ${pct}%. Selecione o mesmo arquivo para continuar.`;
+    $('#resume-text').textContent = t('home.resumeBanner', { name: pending.name, pct });
     resumeBanner.classList.remove('hidden');
   } catch {
     clearPending();
@@ -172,22 +185,26 @@ $('#btn-discard-pending').addEventListener('click', async () => {
     pending = null;
   }
   resumeBanner.classList.add('hidden');
-  toast('Upload pendente descartado');
+  toast(t('home.toastPendingDiscarded'));
 });
 
 function validateFile(file) {
   const allowed = cfg?.allowedExtensions ?? ['.zip', '.7z'];
   const max = cfg?.maxFileSizeBytes ?? 15 * 1024 ** 3;
-  if (!allowed.includes(getExtension(file.name))) return `Tipo não permitido. Envie ${allowed.join(' ou ')}.`;
-  if (file.size === 0) return 'O arquivo está vazio.';
-  if (file.size > max) return `O arquivo tem ${formatBytes(file.size)}; o limite é ${formatBytes(max, 0)}.`;
+  if (!allowed.includes(getExtension(file.name))) {
+    return t('home.errTypeNotAllowed', { allowed: allowed.join(t('common.or')) });
+  }
+  if (file.size === 0) return t('home.errFileEmpty');
+  if (file.size > max) {
+    return t('home.errFileTooLarge', { size: formatBytes(file.size), max: formatBytes(max, 0) });
+  }
   return null;
 }
 
 async function handleFile(file) {
   if (!file) return;
   if (uploader && ['initializing', 'uploading', 'pausing', 'paused', 'finalizing'].includes(uploader.state)) {
-    toast('Já existe um envio em andamento', 'error');
+    toast(t('home.toastUploadInProgress'), 'error');
     return;
   }
   const error = validateFile(file);
@@ -200,7 +217,7 @@ async function handleFile(file) {
   if (pending) {
     if (pending.name === file.name && pending.size === file.size) {
       resumeId = pending.uploadId;
-    } else if (confirm(`Existe um upload pendente de "${pending.name}". Descartá-lo e enviar "${file.name}"?`)) {
+    } else if (confirm(t('home.confirmReplacePending', { oldName: pending.name, newName: file.name }))) {
       api(`/api/uploads/${pending.uploadId}`, { method: 'DELETE' }).catch(() => {});
       clearPending();
     } else {
@@ -225,12 +242,13 @@ function onProgress(p) {
   const pct = Math.min(100, p.percent);
   bar.style.width = `${pct.toFixed(2)}%`;
   progress.setAttribute('aria-valuenow', pct.toFixed(0));
-  $('#stat-percent').textContent = `${pct.toFixed(1).replace('.', ',')}%`;
+  const pctFormatted = getLang() === 'pt-BR' ? pct.toFixed(1).replace('.', ',') : pct.toFixed(1);
+  $('#stat-percent').textContent = `${pctFormatted}%`;
   $('#stat-sent').textContent = `${formatBytes(p.sent)} / ${formatBytes(p.total)}`;
   $('#stat-speed').textContent = p.speed ? `${formatBytes(p.speed)}/s` : '—';
   $('#stat-eta').textContent = p.speed ? formatDuration(p.eta) : '—';
-  if (uploader?.state === 'uploading' && !statusEl.textContent.startsWith('Falha')) {
-    setStatus(`Enviando parte ${Math.min(p.doneChunks + 1, p.totalChunks)} de ${p.totalChunks}…`);
+  if (uploader?.state === 'uploading' && !statusEl.textContent.startsWith('Falha') && !statusEl.textContent.startsWith('Chunk')) {
+    setStatus(t('home.statusUploadingPart', { current: Math.min(p.doneChunks + 1, p.totalChunks), total: p.totalChunks }));
   }
 }
 
@@ -244,7 +262,7 @@ function setButtons({ pause = false, resume = false, cancel = false, retry = fal
 function onState(state, data) {
   switch (state) {
     case 'initializing':
-      setStatus('Preparando envio…');
+      setStatus(t('home.statusPreparing'));
       setButtons({ cancel: true });
       break;
     case 'uploading':
@@ -252,19 +270,19 @@ function onState(state, data) {
       setButtons({ pause: true, cancel: true });
       break;
     case 'pausing':
-      setStatus('Pausando…');
+      setStatus(t('home.statusPausing'));
       setButtons({ cancel: true });
       break;
     case 'paused':
       progress.className = 'progress paused';
-      setStatus('Pausado. Você pode retomar a qualquer momento (até recarregando a página).');
+      setStatus(t('home.statusPaused'));
       $('#stat-speed').textContent = '—';
       $('#stat-eta').textContent = '—';
       setButtons({ resume: true, cancel: true });
       break;
     case 'finalizing':
       progress.className = 'progress indeterminate';
-      setStatus('Finalizando: o servidor está calculando o MD5 (arquivos grandes podem levar alguns minutos)…');
+      setStatus(t('home.statusFinalizing'));
       $('#stat-speed').textContent = '—';
       $('#stat-eta').textContent = '—';
       setButtons({});
@@ -276,33 +294,50 @@ function onState(state, data) {
       break;
     case 'error':
       progress.className = 'progress paused';
-      setStatus(`✕ ${data?.message || 'Erro no envio'}`, 'error');
+      setStatus(`✕ ${data?.message || t('home.statusError')}`, 'error');
       setButtons({ retry: true });
-      toast(data?.message || 'Erro no envio', 'error');
+      toast(data?.message || t('home.statusError'), 'error');
       checkPending();
       break;
     case 'cancelled':
-      toast('Envio cancelado');
+      toast(t('home.toastUploadCancelled'));
       showView('drop');
       break;
   }
 }
 
+function renderUploadResultMeta(file) {
+  if (!file) return;
+  $('#upload-result-meta').textContent = t('home.uploadResultMeta', {
+    name: file.fileName,
+    size: formatBytes(file.sizeBytes, 2),
+    date: formatDate(file.expiresAt),
+  });
+}
+
 function showResult(file) {
+  lastUploadedFile = file;
   $('#file-link').value = absoluteUrl(file.url);
   $('#file-md5').value = file.md5;
   $('#btn-open-file').href = file.url;
   $('#btn-download-file').href = file.downloadUrl;
-  $('#upload-result-meta').textContent = `${file.fileName} · ${formatBytes(file.sizeBytes, 2)} · expira em ${formatDate(file.expiresAt)}`;
+  renderUploadResultMeta(file);
   showView('result');
-  toast('Arquivo enviado!');
+  toast(t('home.toastFileUploaded'));
   fillConfigText(true);
 }
+
+window.addEventListener('langchange', () => {
+  document.title = t('home.pageTitle');
+  updateCounter();
+  if (!resumeBanner.classList.contains('hidden')) checkPending();
+  if (lastUploadedFile) renderUploadResultMeta(lastUploadedFile);
+});
 
 btnPause.addEventListener('click', () => uploader?.pause());
 btnResume.addEventListener('click', () => uploader?.resume());
 btnCancel.addEventListener('click', () => {
-  if (confirm('Cancelar o envio? As partes já enviadas serão apagadas.')) uploader?.cancel();
+  if (confirm(t('home.confirmCancelUpload'))) uploader?.cancel();
 });
 btnRetrySelect.addEventListener('click', () => {
   uploader = null;
@@ -344,7 +379,7 @@ dropzone.addEventListener('drop', (e) => {
   dragDepth = 0;
   dropzone.classList.remove('dragover');
   const files = e.dataTransfer?.files;
-  if (files?.length > 1) toast('Envie um arquivo por vez; usando o primeiro.', 'error');
+  if (files?.length > 1) toast(t('home.toastSingleFile'), 'error');
   handleFile(files?.[0]);
 });
 

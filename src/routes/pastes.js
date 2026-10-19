@@ -53,7 +53,7 @@ function toDto(row) {
     createdAt: row.created_at,
     expiresAt: row.expires_at,
     fileName: downloadName(row),
-    url: `/p/${row.id}`,
+    url: `/pastes/${row.id}`,
   };
 }
 
@@ -99,7 +99,7 @@ router.get(
 
 // ---------- Raw / downloads ----------
 
-router.get('/p/:id/raw', (req, res, next) => {
+router.get(['/pastes/:id/raw', '/p/:id/raw'], (req, res, next) => {
   try {
     const row = loadPaste(req.params.id);
     res.type('text/plain; charset=utf-8');
@@ -109,7 +109,7 @@ router.get('/p/:id/raw', (req, res, next) => {
   }
 });
 
-router.get('/p/:id/download', (req, res, next) => {
+router.get(['/pastes/:id/download', '/p/:id/download'], (req, res, next) => {
   try {
     const row = loadPaste(req.params.id);
     res.download(pastePath(row.id), downloadName(row), {
@@ -120,7 +120,7 @@ router.get('/p/:id/download', (req, res, next) => {
   }
 });
 
-router.get('/p/:id/download.md5', (req, res, next) => {
+router.get(['/pastes/:id/download.md5', '/p/:id/download.md5'], (req, res, next) => {
   try {
     const row = loadPaste(req.params.id);
     const name = downloadName(row);
@@ -134,7 +134,11 @@ router.get('/p/:id/download.md5', (req, res, next) => {
 
 // ---------- Página ----------
 
-router.get('/p/:id', (req, res) => {
+router.get('/pastes', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
+});
+
+router.get(['/pastes/:id', '/p/:id'], (req, res) => {
   let status = 200;
   try {
     loadPaste(req.params.id);

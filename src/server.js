@@ -5,6 +5,7 @@ import { db, closeDb, DB_FILE } from './db.js';
 import pastesRouter from './routes/pastes.js';
 import uploadsRouter from './routes/uploads.js';
 import adminRouter from './routes/admin.js';
+import docsRouter from './routes/docs.js';
 import { startCleanup, stopCleanup } from './services/cleanup.js';
 
 const PUBLIC_DIR = path.resolve('public');
@@ -47,6 +48,7 @@ app.get('/api/config/public', (req, res) => {
 });
 
 // ---------- Estáticos e rotas ----------
+app.use(docsRouter);
 app.use(express.static(PUBLIC_DIR, { extensions: ['html'], index: 'index.html' }));
 app.use(pastesRouter);
 app.use(uploadsRouter);
@@ -62,14 +64,17 @@ function escapeHtml(s) {
 }
 
 function errorPage(status, message) {
-  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+  return `<!doctype html><html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${status} – nulldrive</title><meta name="description" content="${escapeHtml(message)}">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('nulldrive.theme')==='light'?'light':'dark';document.documentElement.lang=localStorage.getItem('nulldrive.lang')==='en-US'?'en-US':'pt-BR'}catch{}</script>
 <link rel="stylesheet" href="/css/style.css"></head>
 <body><div class="bg-glow" aria-hidden="true"></div><main class="container narrow center-page">
 <section class="card state-card"><div class="state-code">${status}</div>
-<h1>${escapeHtml(message)}</h1><p class="muted">O link pode ter expirado ou nunca ter existido.</p>
-<a class="btn btn-primary" href="/" id="btn-home">Voltar ao início</a></section></main></body></html>`;
+<h1 id="err-h1">${escapeHtml(message)}</h1><p class="muted" id="err-p">O link pode ter expirado ou nunca ter existido.</p>
+<a class="btn btn-primary" href="/" id="btn-home">Voltar ao início</a></section></main>
+<script>if(document.documentElement.lang==='en-US'){if(${status}===404)document.getElementById('err-h1').textContent='Page not found';document.getElementById('err-p').textContent='The link may have expired or never existed.';document.getElementById('btn-home').textContent='Back to home'}</script>
+</body></html>`;
 }
 
 // eslint-disable-next-line no-unused-vars
