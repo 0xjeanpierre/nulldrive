@@ -16,7 +16,7 @@ function showError(status, message) {
     status === 410
       ? 'O prazo de retenção acabou e o arquivo foi removido do servidor.'
       : 'O link pode ter expirado, ainda estar em envio ou nunca ter existido.';
-  document.title = `${$('#error-title').textContent} – vpendrive`;
+  document.title = `${$('#error-title').textContent} – nulldrive`;
   $('#state-error').classList.remove('hidden');
 }
 
@@ -28,7 +28,7 @@ async function load() {
     return showError(err.status, err.message);
   }
 
-  document.title = `${file.fileName} – vpendrive`;
+  document.title = `${file.fileName} – nulldrive`;
   $('#file-name').textContent = file.fileName;
   $('#file-badge').textContent = fileBadge(file.fileName);
   $('#meta-size').textContent = formatBytes(file.sizeBytes, 2);

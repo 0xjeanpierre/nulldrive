@@ -1,4 +1,4 @@
-# Roteiro – vpendrive (clone de Pastebin com upload de arquivos)
+# Roteiro – nulldrive (clone de Pastebin com upload de arquivos)
 
 > **Como usar:** entregue este arquivo inteiro como prompt para um agente de código.
 > Ele deve executar as etapas na ordem, validando cada uma antes de seguir.
@@ -7,8 +7,8 @@
 
 ## 0. Objetivo
 
-Criar um site estilo **Pastebin** chamado **vpendrive**, com código na pasta
-`c:\Users\jpos\Documents\dev\vpendrive` e **executado 100% em Docker** (Docker Compose),
+Criar um site estilo **Pastebin** chamado **nulldrive**, com código na pasta
+`c:\Users\jpos\Documents\dev\nulldrive` e **executado 100% em Docker** (Docker Compose),
 com duas funções:
 
 1. **Colar texto** → gera link compartilhável, com download em `.txt` e hash **MD5**.
@@ -41,7 +41,7 @@ criptografia. O foco é **funcionar**.
 | Frontend    | HTML + CSS puro + JavaScript puro (sem framework)              |
 | Config      | `config/config.json` + override por variáveis de ambiente      |
 | Container   | `node:20-bookworm-slim` (multi-stage) + Docker Compose         |
-| Persistência| Volume `vpendrive-storage` → `/app/storage`; `./config` → `/app/config` |
+| Persistência| Volume `nulldrive-storage` → `/app/storage`; `./config` → `/app/config` |
 
 > Por que chunks? Um único POST de 15 GB falha com facilidade (timeout, memória, proxy).
 > Fatiar em partes de ~50 MB torna o envio estável e permite barra de progresso real.
@@ -51,7 +51,7 @@ criptografia. O foco é **funcionar**.
 ## 2. Estrutura de pastas esperada
 
 ```
-vpendrive/
+nulldrive/
 ├─ package.json
 ├─ package-lock.json      # gerar via container (ver seção 9)
 ├─ Dockerfile             # JÁ EXISTE
@@ -86,7 +86,7 @@ vpendrive/
 │     ├─ file.js
 │     └─ uploader.js      # lógica de chunks
 └─ storage/               # no container: /app/storage (volume nomeado)
-   ├─ db/vpendrive.sqlite
+   ├─ db/nulldrive.sqlite
    ├─ pastes/
    ├─ files/
    └─ tmp/                # chunks em andamento
@@ -119,7 +119,7 @@ Regras:
 - Precedência: **padrões no código < config.json < variáveis de ambiente**.
 - Variáveis de ambiente suportadas: `HOST`, `PORT`, `STORAGE_DIR`, `CONFIG_PATH`,
   `RETENTION_DAYS`, `MAX_FILE_SIZE_BYTES`, `CHUNK_SIZE_BYTES`, `CLEANUP_INTERVAL_MINUTES`.
-- O banco SQLite fica em `<storageDir>/db/vpendrive.sqlite` (dentro do volume).
+- O banco SQLite fica em `<storageDir>/db/nulldrive.sqlite` (dentro do volume).
 - Criar as subpastas de `storageDir` no boot, se não existirem.
 - `retentionDays` aceita decimal (ex.: `0.5` = 12 h), mínimo `0.01`, máximo `365`.
 - **Alteração em tempo de execução** (via backend):
@@ -301,10 +301,10 @@ O conteúdo do paste fica em `storage/pastes/<id>.txt` (não no banco).
 | Arquivo                  | Papel                                                            |
 |--------------------------|------------------------------------------------------------------|
 | `Dockerfile`             | Multi-stage; compila `better-sqlite3`; roda como usuário `node`; `HEALTHCHECK` em `/api/health`; `CMD node src/server.js` |
-| `docker-compose.yml`     | Serviço `app`, porta `${VPENDRIVE_PORT:-3000}:3000`, volume `vpendrive-storage`, bind `./config`, `init: true`, logs rotacionados |
+| `docker-compose.yml`     | Serviço `app`, porta `${NULLDRIVE_PORT:-3000}:3000`, volume `nulldrive-storage`, bind `./config`, `init: true`, logs rotacionados |
 | `docker-compose.dev.yml` | Override de desenvolvimento: monta `src/` e `public/`, `node --watch` |
 | `.dockerignore`          | Exclui `node_modules`, `storage`, `config`, `.env`               |
-| `.env.example`           | `VPENDRIVE_PORT` e envs opcionais                                |
+| `.env.example`           | `NULLDRIVE_PORT` e envs opcionais                                |
 
 Requisitos que o código deve cumprir para funcionar no container:
 - Escutar em `HOST`/`PORT` (padrão `0.0.0.0:3000`), nunca `localhost`.

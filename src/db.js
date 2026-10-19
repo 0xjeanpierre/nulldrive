@@ -4,7 +4,7 @@ import { paths, ensureStorageDirs } from './config.js';
 
 ensureStorageDirs();
 
-export const DB_FILE = path.join(paths.db, 'vpendrive.sqlite');
+export const DB_FILE = path.join(paths.db, 'nulldrive.sqlite');
 
 export const db = new Database(DB_FILE);
 db.pragma('journal_mode = WAL');

@@ -1,4 +1,4 @@
-# vpendrive 📦📋
+# nulldrive 📦📋
 
 Clone moderno e minimalista do Pastebin com suporte a compartilhamento de textos e uploads de grandes arquivos compactados (`.zip` e `.7z`) até **15 GB**, com expiração automática configurável (padrão 3 dias) e cálculo de hash **MD5**.
 
@@ -52,13 +52,13 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```powershell
 docker compose down
 ```
-> *Nota: Os dados e uploads ficam salvos no volume nomeado `vpendrive-storage` e não são perdidos ao reiniciar o container. Para apagar completamente todos os arquivos e banco de dados, use `docker compose down -v`.*
+> *Nota: Os dados e uploads ficam salvos no volume nomeado `nulldrive-storage` e não são perdidos ao reiniciar o container. Para apagar completamente todos os arquivos e banco de dados, use `docker compose down -v`.*
 
 ---
 
 ## ⚙️ Configuração
 
-A configuração fica salva em [`config/config.json`](file:///c:/Users/jpos/Documents/dev/vpendrive/config/config.json) (montada como volume dentro do container):
+A configuração fica salva em [`config/config.json`](file:///c:/Users/jpos/Documents/dev/nulldrive/config/config.json) (montada como volume dentro do container):
 
 ```json
 {

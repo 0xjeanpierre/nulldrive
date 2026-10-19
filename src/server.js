@@ -64,7 +64,7 @@ function escapeHtml(s) {
 function errorPage(status, message) {
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${status} – vpendrive</title><meta name="description" content="${escapeHtml(message)}">
+<title>${status} – nulldrive</title><meta name="description" content="${escapeHtml(message)}">
 <link rel="stylesheet" href="/css/style.css"></head>
 <body><div class="bg-glow" aria-hidden="true"></div><main class="container narrow center-page">
 <section class="card state-card"><div class="state-code">${status}</div>
@@ -99,11 +99,11 @@ app.use((err, req, res, next) => {
 
 // ---------- Servidor ----------
 const server = app.listen(config.port, config.host, () => {
-  console.log(`[vpendrive] Ouvindo em http://${config.host}:${config.port}`);
-  console.log(`[vpendrive] Config: ${CONFIG_PATH}`);
-  console.log(`[vpendrive] Storage: ${config.storageDir} | DB: ${DB_FILE}`);
+  console.log(`[nulldrive] Ouvindo em http://${config.host}:${config.port}`);
+  console.log(`[nulldrive] Config: ${CONFIG_PATH}`);
+  console.log(`[nulldrive] Storage: ${config.storageDir} | DB: ${DB_FILE}`);
   console.log(
-    `[vpendrive] Retenção: ${config.retentionDays} dia(s) | Limite: ${(config.maxFileSizeBytes / 1024 ** 3).toFixed(2)} GB | ` +
+    `[nulldrive] Retenção: ${config.retentionDays} dia(s) | Limite: ${(config.maxFileSizeBytes / 1024 ** 3).toFixed(2)} GB | ` +
       `Chunk: ${(config.chunkSizeBytes / 1024 ** 2).toFixed(0)} MB`
   );
   startCleanup();
@@ -120,19 +120,19 @@ let shuttingDown = false;
 function shutdown(signal) {
   if (shuttingDown) return;
   shuttingDown = true;
-  console.log(`[vpendrive] ${signal} recebido, encerrando...`);
+  console.log(`[nulldrive] ${signal} recebido, encerrando...`);
   stopCleanup();
   server.closeIdleConnections?.();
 
   const force = setTimeout(() => {
-    console.warn('[vpendrive] Encerrando conexões ativas à força.');
+    console.warn('[nulldrive] Encerrando conexões ativas à força.');
     server.closeAllConnections?.();
   }, 20_000);
   force.unref();
 
   server.close(() => {
     closeDb();
-    console.log('[vpendrive] Encerrado.');
+    console.log('[nulldrive] Encerrado.');
     process.exit(0);
   });
   setTimeout(() => {

@@ -1,6 +1,6 @@
 import { api } from './common.js';
 
-const STORAGE_KEY = 'vpendrive.pendingUpload';
+const STORAGE_KEY = 'nulldrive.pendingUpload';
 const FATAL_STATUS = new Set([400, 404, 409, 410, 413, 415, 507]);
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 

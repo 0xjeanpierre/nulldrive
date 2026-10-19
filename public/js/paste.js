@@ -16,7 +16,7 @@ function showError(status, message) {
     status === 410
       ? 'O prazo de retenção acabou e o conteúdo foi removido do servidor.'
       : 'O link pode ter expirado ou nunca ter existido.';
-  document.title = `${$('#error-title').textContent} – vpendrive`;
+  document.title = `${$('#error-title').textContent} – nulldrive`;
   $('#state-error').classList.remove('hidden');
 }
 
@@ -29,7 +29,7 @@ async function load() {
   }
 
   const title = paste.title || 'Paste sem título';
-  document.title = `${title} – vpendrive`;
+  document.title = `${title} – nulldrive`;
   $('#paste-title').textContent = title;
   $('#meta-created').textContent = formatDate(paste.createdAt);
   $('#meta-size').textContent = formatBytes(paste.sizeBytes);

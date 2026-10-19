@@ -1,16 +1,16 @@
-name: vpendrive
+name: nulldrive
 
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    image: vpendrive:latest
-    container_name: vpendrive
+    image: nulldrive:latest
+    container_name: nulldrive
     restart: unless-stopped
     init: true                      # tini como PID 1 (sinais e processos zumbis)
     ports:
-      - "${VPENDRIVE_PORT:-3000}:3000"
+      - "${NULLDRIVE_PORT:-3000}:3000"
     environment:
       NODE_ENV: production
       HOST: 0.0.0.0
@@ -25,7 +25,7 @@ services:
       # CLEANUP_INTERVAL_MINUTES: ${CLEANUP_INTERVAL_MINUTES:-60}
     volumes:
       # Arquivos enviados, pastes, chunks temporários e banco SQLite
-      - vpendrive-storage:/app/storage
+      - nulldrive-storage:/app/storage
       # Configuração editável pelo host e gravável pelo endpoint admin
       - ./config:/app/config
       # Alternativa: guardar os arquivos numa pasta do host (mais lento no Windows/WSL2)
@@ -38,4 +38,4 @@ services:
         max-file: "3"
 
 volumes:
-  vpendrive-storage:
+  nulldrive-storage:
