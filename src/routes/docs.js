@@ -12,11 +12,11 @@ function buildOpenApiSpec(lang = 'pt-BR') {
   return {
     openapi: '3.0.3',
     info: {
-      title: 'Null Drive API',
+      title: 'NullDrive API',
       version: '1.0.0',
       description: t(
-        'API REST do **Null Drive** (`nulldrive`) para compartilhamento de textos (pastes) e upload fatiado (chunks) de arquivos `.zip` e `.7z` de até 1 GB com verificação MD5 e expiração automática.',
-        'REST API for **Null Drive** (`nulldrive`) for sharing text pastes and chunked uploads of `.zip` and `.7z` files up to 1 GB with MD5 verification and automatic expiration.'
+        'API REST do **NullDrive** (`nulldrive`) para compartilhamento de textos (pastes) e upload fatiado (chunks) de arquivos `.zip` e `.7z` de até 1 GB com verificação MD5 e expiração automática.',
+        'REST API for **NullDrive** (`nulldrive`) for sharing text pastes and chunked uploads of `.zip` and `.7z` files up to 1 GB with MD5 verification and automatic expiration.'
       ),
     },
     servers: [
@@ -104,7 +104,7 @@ function buildOpenApiSpec(lang = 'pt-BR') {
                     },
                     content: {
                       type: 'string',
-                      example: 'Hello Null Drive!',
+                      example: 'Hello NullDrive!',
                       description: t('Conteúdo em texto UTF-8', 'UTF-8 text content'),
                     },
                   },
@@ -549,7 +549,7 @@ function buildOpenApiSpec(lang = 'pt-BR') {
             {
               type: 'object',
               properties: {
-                content: { type: 'string', example: 'Hello Null Drive!' },
+                content: { type: 'string', example: 'Hello NullDrive!' },
               },
             },
           ],
