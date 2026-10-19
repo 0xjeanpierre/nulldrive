@@ -5,7 +5,7 @@ const LANG_KEY = 'nulldrive.lang';
 
 export const TRANSLATIONS = {
   'pt-BR': {
-    'brand.aria': 'nulldrive – início',
+    'brand.aria': 'Null Drive – início',
     'header.pill': 'Sem cadastro · expira em <b data-cfg="retention">3 dias</b>',
     'header.newPaste': '+ Novo',
     'header.uploadFile': '+ Enviar arquivo',
@@ -125,7 +125,7 @@ export const TRANSLATIONS = {
     'file.verifyTitle': 'Verificar integridade após baixar',
   },
   'en-US': {
-    'brand.aria': 'nulldrive – home',
+    'brand.aria': 'Null Drive – home',
     'header.pill': 'No sign-up · expires in <b data-cfg="retention">3 days</b>',
     'header.newPaste': '+ New',
     'header.uploadFile': '+ Upload file',
