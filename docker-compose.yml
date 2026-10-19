@@ -10,11 +10,11 @@ services:
     restart: unless-stopped
     init: true                      # tini como PID 1 (sinais e processos zumbis)
     ports:
-      - "${NULLDRIVE_PORT:-3000}:3000"
+      - "${NULLDRIVE_PORT:-8000}:8000"
     environment:
       NODE_ENV: production
       HOST: 0.0.0.0
-      PORT: 3000
+      PORT: 8000
       STORAGE_DIR: /app/storage
       CONFIG_PATH: /app/config/config.json
       # Descomente para FORÇAR via env (tem prioridade sobre config.json e

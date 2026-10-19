@@ -4,7 +4,7 @@ import { EventEmitter } from 'node:events';
 
 /** Valores padrão (menor precedência). */
 export const DEFAULTS = Object.freeze({
-  port: 3000,
+  port: 8000,
   host: '0.0.0.0',
   storageDir: './storage',
   retentionDays: 3,

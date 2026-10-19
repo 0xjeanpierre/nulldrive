@@ -24,7 +24,7 @@ FROM node:20-bookworm-slim AS runtime
 
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
-    PORT=3000 \
+    PORT=8000 \
     STORAGE_DIR=/app/storage \
     CONFIG_PATH=/app/config/config.json
 
@@ -41,11 +41,11 @@ RUN mkdir -p /app/storage/pastes /app/storage/files /app/storage/tmp /app/storag
 
 USER node
 
-EXPOSE 3000
+EXPOSE 8000
 
 VOLUME ["/app/storage"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||8000)+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
 CMD ["node", "src/server.js"]

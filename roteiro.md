@@ -98,7 +98,7 @@ nulldrive/
 
 ```json
 {
-  "port": 3000,
+  "port": 8000,
   "host": "0.0.0.0",
   "storageDir": "/app/storage",
   "retentionDays": 3,
@@ -301,13 +301,13 @@ O conteúdo do paste fica em `storage/pastes/<id>.txt` (não no banco).
 | Arquivo                  | Papel                                                            |
 |--------------------------|------------------------------------------------------------------|
 | `Dockerfile`             | Multi-stage; compila `better-sqlite3`; roda como usuário `node`; `HEALTHCHECK` em `/api/health`; `CMD node src/server.js` |
-| `docker-compose.yml`     | Serviço `app`, porta `${NULLDRIVE_PORT:-3000}:3000`, volume `nulldrive-storage`, bind `./config`, `init: true`, logs rotacionados |
+| `docker-compose.yml`     | Serviço `app`, porta `${NULLDRIVE_PORT:-8000}:8000`, volume `nulldrive-storage`, bind `./config`, `init: true`, logs rotacionados |
 | `docker-compose.dev.yml` | Override de desenvolvimento: monta `src/` e `public/`, `node --watch` |
 | `.dockerignore`          | Exclui `node_modules`, `storage`, `config`, `.env`               |
 | `.env.example`           | `NULLDRIVE_PORT` e envs opcionais                                |
 
 Requisitos que o código deve cumprir para funcionar no container:
-- Escutar em `HOST`/`PORT` (padrão `0.0.0.0:3000`), nunca `localhost`.
+- Escutar em `HOST`/`PORT` (padrão `0.0.0.0:8000`), nunca `localhost`.
 - Ler `STORAGE_DIR` e `CONFIG_PATH` das envs.
 - Logs só em stdout/stderr (sem arquivo de log).
 - Nenhum caminho absoluto do Windows no código.
@@ -322,7 +322,7 @@ docker run --rm -v "${PWD}:/app" -w /app node:20-bookworm-slim npm install --pac
 copy .env.example .env          # opcional
 docker compose up -d --build    # produção local
 docker compose logs -f app
-# abrir http://localhost:3000
+# abrir http://localhost:8000
 
 # desenvolvimento com hot reload
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
@@ -335,7 +335,7 @@ docker compose down -v
 
 ### Alterar a retenção com o container rodando
 ```powershell
-curl.exe -X PUT http://localhost:3000/api/admin/config -H "Content-Type: application/json" -d "{\"retentionDays\": 5}"
+curl.exe -X PUT http://localhost:8000/api/admin/config -H "Content-Type: application/json" -d "{\"retentionDays\": 5}"
 ```
 Ou editar `config/config.json` no host e rodar `docker compose restart app`.
 
@@ -353,7 +353,7 @@ pastas.
 
 ## 10. Checklist de validação (o agente deve testar)
 
-Todos os testes rodam contra o container (`http://localhost:3000`).
+Todos os testes rodam contra o container (`http://localhost:8000`).
 
 - [ ] `docker compose build` termina sem erros.
 - [ ] `docker compose up -d` e `docker compose ps` mostra o serviço como `healthy`.

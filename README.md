@@ -35,7 +35,7 @@ O projeto foi totalmente projetado para rodar isolado em Docker. Não é necess�
 ```powershell
 docker compose up -d --build
 ```
-Acesse a aplicação no navegador em: **[http://localhost:3000](http://localhost:3000)**.
+Acesse a aplicação no navegador em: **[http://localhost:8000](http://localhost:8000)**.
 
 Para acompanhar os logs do servidor:
 ```powershell
@@ -62,7 +62,7 @@ A configuração fica salva em [`config/config.json`](file:///c:/Users/jpos/Docu
 
 ```json
 {
-  "port": 3000,
+  "port": 8000,
   "host": "0.0.0.0",
   "storageDir": "/app/storage",
   "retentionDays": 3,
@@ -80,14 +80,14 @@ A configuração fica salva em [`config/config.json`](file:///c:/Users/jpos/Docu
 Você pode alterar a retenção de novos envios para, por exemplo, 5 dias, através de uma chamada HTTP:
 
 ```powershell
-curl.exe -X PUT http://localhost:3000/api/admin/config `
+curl.exe -X PUT http://localhost:8000/api/admin/config `
   -H "Content-Type: application/json" `
   -d '{"retentionDays": 5}'
 ```
 
 Também é possível forçar a limpeza imediata de arquivos expirados:
 ```powershell
-curl.exe -X POST http://localhost:3000/api/admin/cleanup
+curl.exe -X POST http://localhost:8000/api/admin/cleanup
 ```
 
 ---
