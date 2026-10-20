@@ -1,2 +1,3 @@
 push:
-	git add . && git commit -m "UPDATE: Background." && git push
+	read MSG
+	git add . && git commit -m $MSG && git push
