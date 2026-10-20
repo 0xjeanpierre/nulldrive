@@ -5,7 +5,7 @@
   "retentionDays": 3,
   "maxFileSizeBytes": 1073741824,
   "chunkSizeBytes": 52428800,
-  "allowedExtensions": [".zip", ".7z"],
+  "allowedExtensions": [],
   "maxPasteSizeBytes": 10485760,
   "cleanupIntervalMinutes": 60,
   "incompleteUploadTtlHours": 24

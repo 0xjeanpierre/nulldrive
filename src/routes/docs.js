@@ -15,8 +15,8 @@ function buildOpenApiSpec(lang = 'pt-BR') {
       title: 'NullDrive API',
       version: '1.0.0',
       description: t(
-        'API REST do **NullDrive** (`nulldrive`) para compartilhamento de textos (pastes) e upload fatiado (chunks) de arquivos `.zip` e `.7z` de até 1 GB com verificação MD5 e expiração automática.',
-        'REST API for **NullDrive** (`nulldrive`) for sharing text pastes and chunked uploads of `.zip` and `.7z` files up to 1 GB with MD5 verification and automatic expiration.'
+        'API REST do **NullDrive** (`nulldrive`) para compartilhamento de textos (pastes) e upload fatiado (chunks) de qualquer tipo de arquivo de até 1 GB com verificação MD5 e expiração automática.',
+        'REST API for **NullDrive** (`nulldrive`) for sharing text pastes and chunked uploads of any file type up to 1 GB with MD5 verification and automatic expiration.'
       ),
     },
     servers: [
@@ -193,7 +193,7 @@ function buildOpenApiSpec(lang = 'pt-BR') {
       '/api/uploads/init': {
         post: {
           tags: ['Uploads'],
-          summary: t('Inicia um novo upload fatiado (.zip ou .7z)', 'Initialize a new chunked upload (.zip or .7z)'),
+          summary: t('Inicia um novo upload fatiado (qualquer tipo de arquivo)', 'Initialize a new chunked upload (any file type)'),
           requestBody: {
             required: true,
             content: {
@@ -525,7 +525,7 @@ function buildOpenApiSpec(lang = 'pt-BR') {
             retentionDays: { type: 'number', example: config.retentionDays },
             maxFileSizeBytes: { type: 'integer', example: config.maxFileSizeBytes },
             chunkSizeBytes: { type: 'integer', example: config.chunkSizeBytes },
-            allowedExtensions: { type: 'array', items: { type: 'string' }, example: config.allowedExtensions },
+            allowedExtensions: { type: 'array', items: { type: 'string' }, example: config.allowedExtensions, description: t('Lista vazia = qualquer tipo de arquivo', 'Empty list = any file type') },
             maxPasteSizeBytes: { type: 'integer', example: config.maxPasteSizeBytes },
             stats: { $ref: '#/components/schemas/Stats' },
           },

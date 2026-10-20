@@ -32,9 +32,11 @@ export const TRANSLATIONS = {
     'common.withMd5': 'Com .md5',
     'common.or': ' ou ',
 
-    'home.pageTitle': 'nulldrive – Compartilhe textos e arquivos .zip/.7z',
+    'home.pageTitle': 'nulldrive – Compartilhe textos e arquivos',
     'home.intro':
-      'Cole um texto ou envie um <b>.zip</b> / <b>.7z</b> de até <b data-cfg="maxFile">1 GB</b>. Você recebe um link com hash MD5 para conferir a integridade.',
+      'Cole um texto ou envie <b>qualquer arquivo</b> de até <b data-cfg="maxFile">1 GB</b>. Você recebe um link com hash MD5 para conferir a integridade.',
+    'home.anyType': 'qualquer tipo',
+    'home.errFolder': 'Pastas não são suportadas. Envie um arquivo (compacte a pasta em .zip, se precisar).',
     'home.tabText': '📋 Colar texto',
     'home.tabFile': '📦 Enviar arquivo',
     'home.pasteTitleLabel': 'Título',
@@ -152,9 +154,11 @@ export const TRANSLATIONS = {
     'common.withMd5': 'With .md5',
     'common.or': ' or ',
 
-    'home.pageTitle': 'nulldrive – Share text and .zip/.7z files',
+    'home.pageTitle': 'nulldrive – Share text and files',
     'home.intro':
-      'Paste text or upload a <b>.zip</b> / <b>.7z</b> file up to <b data-cfg="maxFile">1 GB</b>. You get a shareable link with an MD5 hash to verify integrity.',
+      'Paste text or upload <b>any file</b> up to <b data-cfg="maxFile">1 GB</b>. You get a shareable link with an MD5 hash to verify integrity.',
+    'home.anyType': 'any file type',
+    'home.errFolder': 'Folders are not supported. Upload a file (zip the folder first, if needed).',
     'home.tabText': '📋 Paste text',
     'home.tabFile': '📦 Upload file',
     'home.pasteTitleLabel': 'Title',
@@ -513,7 +517,7 @@ export function getPublicConfig(force = false) {
       retentionDays: 3,
       maxFileSizeBytes: 1 * 1024 ** 3,
       chunkSizeBytes: 50 * 1024 ** 2,
-      allowedExtensions: ['.zip', '.7z'],
+      allowedExtensions: [],
       maxPasteSizeBytes: 10 * 1024 ** 2,
       stats: {
         totalFiles: 0,
@@ -535,7 +539,7 @@ export async function fillConfigText(force = false) {
     retention: formatRetention(cfg.retentionDays),
     maxFile: formatBytes(cfg.maxFileSizeBytes, 0),
     maxPaste: formatBytes(cfg.maxPasteSizeBytes, 0),
-    exts: cfg.allowedExtensions.join(' · '),
+    exts: cfg.allowedExtensions?.length ? cfg.allowedExtensions.join(' · ') : t('home.anyType'),
     usedStorage: formatBytes(stats.totalSizeBytes),
     totalFiles: stats.totalItems.toLocaleString(lang),
     filesCount: stats.totalFiles.toLocaleString(lang),

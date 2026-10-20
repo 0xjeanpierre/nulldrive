@@ -6,7 +6,7 @@ import express from 'express';
 import { config, paths } from '../config.js';
 import { db } from '../db.js';
 import { newId, md5File, md5FileContent } from '../utils/hash.js';
-import { sanitizeFileName, isAllowedExtension, matchesExtension } from '../services/validate.js';
+import { sanitizeFileName, isAllowedExtension } from '../services/validate.js';
 import { HttpError, asyncHandler, DAY_MS } from '../utils/http.js';
 
 const router = express.Router();
@@ -77,17 +77,6 @@ function fileDto(row) {
     url: `/files/${row.id}`,
     downloadUrl: `/files/${row.id}/download`,
   };
-}
-
-async function readHeader(file, length = 8) {
-  const fh = await fs.promises.open(file, 'r');
-  try {
-    const buf = Buffer.alloc(length);
-    const { bytesRead } = await fh.read(buf, 0, length, 0);
-    return buf.subarray(0, bytesRead);
-  } finally {
-    await fh.close();
-  }
 }
 
 async function discardUpload(id) {
@@ -178,15 +167,6 @@ router.put(
       throw err;
     }
     if (written !== expected) throw new HttpError(400, `Parte ${idx} incompleta (${written}/${expected} bytes)`);
-
-    if (idx === 0) {
-      const header = await readHeader(partPath(row.id));
-      if (!matchesExtension(header, row.original_name)) {
-        stmts.setStatus.run('failed', Date.now(), row.id);
-        await fs.promises.rm(partPath(row.id), { force: true });
-        throw new HttpError(415, 'O conteúdo não é um arquivo .zip/.7z válido');
-      }
-    }
 
     const current = stmts.get.get(row.id);
     if (!current || current.status !== 'uploading') throw new HttpError(409, 'Upload foi cancelado ou finalizado');
@@ -294,7 +274,12 @@ router.get(['/files/:id/download', '/f/:id/download'], (req, res, next) => {
   try {
     const row = loadReadyFile(req.params.id);
     // res.download usa `send`: Content-Length, Range/206, ETag e Last-Modified
-    res.download(filePath(row), row.original_name, { acceptRanges: true, cacheControl: false }, (err) => {
+    // Qualquer tipo de arquivo: força download (attachment) e impede o navegador de "adivinhar" o tipo
+    res.download(filePath(row), row.original_name, {
+      acceptRanges: true,
+      cacheControl: false,
+      headers: { 'X-Content-Type-Options': 'nosniff' },
+    }, (err) => {
       if (err && !res.headersSent) next(err);
     });
   } catch (err) {

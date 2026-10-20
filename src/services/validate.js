@@ -19,30 +19,8 @@ export function getExtension(name) {
   return path.extname(String(name ?? '')).toLowerCase();
 }
 
+/** Lista vazia = qualquer tipo de arquivo é aceito. */
 export function isAllowedExtension(name, allowed) {
+  if (!Array.isArray(allowed) || allowed.length === 0) return true;
   return allowed.includes(getExtension(name));
-}
-
-const SIGNATURES = {
-  zip: [
-    [0x50, 0x4b, 0x03, 0x04],
-    [0x50, 0x4b, 0x05, 0x06],
-    [0x50, 0x4b, 0x07, 0x08],
-  ],
-  '7z': [[0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c]],
-};
-
-/** Detecta o tipo real pelo cabeçalho (magic bytes). */
-export function detectArchiveType(buf) {
-  for (const [type, sigs] of Object.entries(SIGNATURES)) {
-    if (sigs.some((sig) => buf.length >= sig.length && sig.every((b, i) => buf[i] === b))) return type;
-  }
-  return null;
-}
-
-/** Confere se o conteúdo bate com a extensão declarada. */
-export function matchesExtension(buf, fileName) {
-  const ext = getExtension(fileName);
-  const type = detectArchiveType(buf);
-  return (ext === '.zip' && type === 'zip') || (ext === '.7z' && type === '7z');
 }

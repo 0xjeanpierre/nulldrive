@@ -10,7 +10,7 @@ export const DEFAULTS = Object.freeze({
   retentionDays: 3,
   maxFileSizeBytes: 1 * 1024 ** 3, // 1 GB
   chunkSizeBytes: 50 * 1024 ** 2, // 50 MB
-  allowedExtensions: ['.zip', '.7z'],
+  allowedExtensions: [], // vazio = qualquer tipo de arquivo
   maxPasteSizeBytes: 10 * 1024 ** 2, // 10 MB
   cleanupIntervalMinutes: 60,
   incompleteUploadTtlHours: 24,
@@ -36,8 +36,6 @@ export const EDITABLE = {
   cleanupIntervalMinutes: { type: 'number', min: 1, max: 1440 },
   incompleteUploadTtlHours: { type: 'number', min: 1, max: 720 },
 };
-
-const ALLOWED_EXTENSIONS = ['.zip', '.7z'];
 
 export const CONFIG_PATH = path.resolve(process.env.CONFIG_PATH || './config/config.json');
 
@@ -109,10 +107,17 @@ function sanitize(cfg) {
       out[key] = DEFAULTS[key];
     }
   }
-  const exts = Array.isArray(out.allowedExtensions)
-    ? out.allowedExtensions.map((e) => String(e).toLowerCase()).filter((e) => ALLOWED_EXTENSIONS.includes(e))
+  // Lista opcional de extensões permitidas; vazia = qualquer tipo de arquivo
+  out.allowedExtensions = Array.isArray(out.allowedExtensions)
+    ? [
+        ...new Set(
+          out.allowedExtensions
+            .map((e) => String(e).trim().toLowerCase())
+            .filter(Boolean)
+            .map((e) => (e.startsWith('.') ? e : `.${e}`))
+        ),
+      ]
     : [];
-  out.allowedExtensions = exts.length ? [...new Set(exts)] : [...DEFAULTS.allowedExtensions];
   out.port = Number.isInteger(out.port) && out.port > 0 && out.port < 65536 ? out.port : DEFAULTS.port;
   out.host = typeof out.host === 'string' && out.host ? out.host : DEFAULTS.host;
   out.storageDir = path.resolve(typeof out.storageDir === 'string' && out.storageDir ? out.storageDir : DEFAULTS.storageDir);

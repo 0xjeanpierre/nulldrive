@@ -1,6 +1,6 @@
 # nulldrive 📦📋
 
-Clone moderno e minimalista do Pastebin com suporte a compartilhamento de textos e uploads de grandes arquivos compactados (`.zip` e `.7z`) até **1 GB**, com expiração automática configurável (padrão 3 dias) e cálculo de hash **MD5**.
+Clone moderno e minimalista do Pastebin com suporte a compartilhamento de textos e uploads de **qualquer tipo de arquivo** (exceto pastas) até **1 GB**, com expiração automática configurável (padrão 3 dias) e cálculo de hash **MD5**.
 
 ---
 
@@ -13,10 +13,10 @@ Clone moderno e minimalista do Pastebin com suporte a compartilhamento de textos
    - Visualização com numeração de linhas, contagem regressiva e atalhos rápidos de cópia.
 
 2. **Upload de Arquivos Grandes**
-   - Suporte exclusivo a arquivos compactados: `.zip` e `.7z`.
+   - Aceita **qualquer tipo de arquivo** (pastas não são suportadas — compacte-as antes).
    - Limite máximo: **1 GB**.
    - Envio fatiado em **chunks de 50 MB** com streaming direto em disco (sem estourar a memória RAM do servidor).
-   - Validação antecipada por **Magic Bytes** (impede que arquivos renomeados burlem a validação).
+   - Opcional: restringir extensões via `allowedExtensions` no `config.json` (lista vazia = qualquer tipo).
    - Suporte a **Pausar**, **Retomar** e recuperação automática em caso de instabilidade de rede ou recarregamento de página.
    - Download com suporte a **HTTP Range** (permite pausar/retomar downloads no navegador).
 
@@ -74,7 +74,7 @@ A configuração fica salva em [`config/config.json`](file:///c:/Users/jpos/Docu
   "retentionDays": 3,
   "maxFileSizeBytes": 1073741824,
   "chunkSizeBytes": 52428800,
-  "allowedExtensions": [".zip", ".7z"],
+  "allowedExtensions": [],
   "maxPasteSizeBytes": 10485760,
   "cleanupIntervalMinutes": 60,
   "incompleteUploadTtlHours": 24
@@ -100,7 +100,7 @@ curl.exe -X POST http://localhost:8000/api/admin/cleanup
 
 ## 🔍 Como Validar os Hashes MD5
 
-Ao baixar o `.txt` ou `.zip`/`.7z`, valide a integridade usando o terminal:
+Ao baixar o `.txt` ou o arquivo enviado, valide a integridade usando o terminal:
 
 - **Windows (PowerShell / Prompt):**
   ```powershell

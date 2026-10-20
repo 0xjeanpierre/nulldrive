@@ -189,9 +189,9 @@ $('#btn-discard-pending').addEventListener('click', async () => {
 });
 
 function validateFile(file) {
-  const allowed = cfg?.allowedExtensions ?? ['.zip', '.7z'];
+  const allowed = cfg?.allowedExtensions ?? []; // vazio = qualquer tipo
   const max = cfg?.maxFileSizeBytes ?? 1 * 1024 ** 3;
-  if (!allowed.includes(getExtension(file.name))) {
+  if (allowed.length && !allowed.includes(getExtension(file.name))) {
     return t('home.errTypeNotAllowed', { allowed: allowed.join(t('common.or')) });
   }
   if (file.size === 0) return t('home.errFileEmpty');
@@ -201,10 +201,32 @@ function validateFile(file) {
   return null;
 }
 
-async function handleFile(file) {
+/** Pastas arrastadas viram um "File" que não pode ser lido; detecta lendo o primeiro byte. */
+async function isFolder(file) {
+  try {
+    await file.slice(0, 1).arrayBuffer();
+    return false;
+  } catch {
+    return true;
+  }
+}
+
+/** Extrai o primeiro item do drag & drop, sinalizando se é uma pasta (deve ser chamado de forma síncrona no evento). */
+function pickDropped(dataTransfer) {
+  const files = dataTransfer?.files;
+  if (!files?.length) return null;
+  const entry = dataTransfer.items?.[0]?.webkitGetAsEntry?.();
+  return { file: files[0], isDir: !!entry?.isDirectory, count: files.length };
+}
+
+async function handleFile(file, { isDir = false } = {}) {
   if (!file) return;
   if (uploader && ['initializing', 'uploading', 'pausing', 'paused', 'finalizing'].includes(uploader.state)) {
     toast(t('home.toastUploadInProgress'), 'error');
+    return;
+  }
+  if (isDir || (await isFolder(file))) {
+    toast(t('home.errFolder'), 'error');
     return;
   }
   const error = validateFile(file);
@@ -378,9 +400,10 @@ dropzone.addEventListener('drop', (e) => {
   e.preventDefault();
   dragDepth = 0;
   dropzone.classList.remove('dragover');
-  const files = e.dataTransfer?.files;
-  if (files?.length > 1) toast(t('home.toastSingleFile'), 'error');
-  handleFile(files?.[0]);
+  const picked = pickDropped(e.dataTransfer);
+  if (!picked) return;
+  if (picked.count > 1) toast(t('home.toastSingleFile'), 'error');
+  handleFile(picked.file, { isDir: picked.isDir });
 });
 
 // Arquivo solto fora da dropzone: muda para a aba e não deixa o navegador abrir o arquivo
@@ -388,8 +411,9 @@ window.addEventListener('dragover', (e) => e.preventDefault());
 window.addEventListener('drop', (e) => {
   e.preventDefault();
   if (e.dataTransfer?.files?.length && !dropzone.contains(e.target)) {
+    const picked = pickDropped(e.dataTransfer);
     selectTab('file');
-    handleFile(e.dataTransfer.files[0]);
+    handleFile(picked.file, { isDir: picked.isDir });
   }
 });
 
