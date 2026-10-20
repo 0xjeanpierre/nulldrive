@@ -187,15 +187,23 @@ pre {
   white-space: nowrap;
 }
 
-/* Fundo sutil monocromático */
+/* Fundo com imagem de Buraco Negro */
 .bg-glow {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(800px 500px at 50% -10%, var(--glow-1), transparent 70%),
-    radial-gradient(600px 400px at 50% 110%, var(--glow-2), transparent 70%),
+    radial-gradient(ellipse at 50% 50%, rgba(14, 16, 21, 0.35) 0%, rgba(10, 12, 16, 0.72) 100%),
+    url('/blackhole.jpg') center center / cover no-repeat,
+    var(--bg);
+  transition: background 0.3s, filter 0.3s;
+}
+
+[data-theme='light'] .bg-glow {
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(245, 246, 248, 0.68) 0%, rgba(245, 246, 248, 0.86) 100%),
+    url('/blackhole.jpg') center center / cover no-repeat,
     var(--bg);
 }
 
