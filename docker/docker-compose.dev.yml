@@ -1,15 +1,20 @@
 # Uso (a partir da raiz): make dev
+# - app:   http://localhost:8000 (HTTP direto)
+# - nginx: https://localhost:8443 (certificado autoassinado; o navegador vai avisar)
 services:
   app:
     environment:
       NODE_ENV: development
     command: ["node", "--watch", "src/server.js"]
+    ports:
+      - "8000:8000"
     volumes:
       - ../app/src:/app/src
       - ../app/public:/app/public
     restart: "no"
 
   nginx:
+    profiles: !reset []             # ativo no dev (no base ele só sobe com profile prod)
     ports: !override
-      - "${NGINX_DEV_HTTPS_PORT:-8443}:443"
+      - "8443:443"
     restart: "no"

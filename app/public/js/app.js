@@ -22,7 +22,6 @@ initPreferences();
 document.title = t('home.pageTitle');
 
 let cfg = await fillConfigText();
-updateCounter();
 cfg ??= await getPublicConfig();
 bindCopyButtons();
 
@@ -79,6 +78,7 @@ function updateCounter() {
   });
 }
 contentEl.addEventListener('input', updateCounter);
+updateCounter(); // após declarar counterRaf/contentEl (evita TDZ)
 
 // Tab insere tabulação no editor
 contentEl.addEventListener('keydown', (e) => {

@@ -43,6 +43,7 @@ services:
     image: nginx:alpine
     container_name: nulldrive_nginx
     restart: unless-stopped
+    profiles: ["prod"]              # proxy reverso HTTPS; fora do make dev
     depends_on:
       app:
         condition: service_healthy

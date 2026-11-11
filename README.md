@@ -53,7 +53,12 @@ Se quiser modificar o código com reinício automático:
 ```powershell
 make dev
 ```
-No modo desenvolvimento, o Nginx responde em **[http://localhost:8080](http://localhost:8080)** (HTTP) e **[https://localhost:8443](https://localhost:8443)** (HTTPS).
+No modo desenvolvimento, a aplicação fica acessível de duas formas:
+
+- **[http://localhost:8000](http://localhost:8000)**: HTTP direto na aplicação (Swagger em **[http://localhost:8000/docs](http://localhost:8000/docs)**).
+- **[https://localhost:8443](https://localhost:8443)**: HTTPS via Nginx com certificado **autoassinado**. O navegador vai exibir um aviso de segurança; é esperado, basta aceitar. Algumas funções só funcionam por HTTPS.
+
+O código de `app/src` e `app/public` é montado no container e o servidor reinicia automaticamente ao salvar.
 
 ### 3. Parar o serviço
 ```powershell

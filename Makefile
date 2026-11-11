@@ -1,4 +1,4 @@
-.PHONY: help up build dev down clean restart logs ps status check test scan cleanup push
+.PHONY: help up build dev down clean restart logs ps status check scan cleanup push
 
 .DEFAULT_GOAL := help
 
@@ -36,9 +36,6 @@ ps: ## Lista o status dos containers
 
 cleanup: ## Dispara a limpeza imediata de arquivos expirados via API
 	curl -sk -X POST https://localhost:443/api/admin/cleanup && echo ""
-
-test: ## Roda os testes em container Docker e gera coverage/lcov.info
-	@./tests/run.sh
 
 scan: ## Roda o SonarQube Scanner sobre o projeto (usa scan/sonar-scan.sh)
 	@./scan/sonar-scan.sh
