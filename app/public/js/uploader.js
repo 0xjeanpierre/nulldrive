@@ -159,50 +159,71 @@ export class ChunkUploader {
     }
   }
 
-  async worker(limit = Infinity) {
-    let n = 0;
-    while (!this.paused && !this.cancelled && !this.fatal && this.queue.length && n < limit) {
-      const idx = this.queue.shift();
-      n++;
-      try {
-        await this.sendWithRetry(idx);
-        this.done.add(idx);
-        this.confirmedBytes += this.chunkLength(idx);
-      } catch (err) {
-        if (err.name === 'AbortError') {
-          this.queue.unshift(idx);
-        } else {
-          this.fatal = err;
-          this.abortAll();
-        }
-      } finally {
-        this.inflight.delete(idx);
-        this.emitProgress();
-      }
+  async worker(limit = Infinity, processed = 0) {
+    if (this.paused || this.cancelled || this.fatal || !this.queue.length || processed >= limit) {
+      return;
     }
+    const idx = this.queue.shift();
+    try {
+      await this.sendWithRetry(idx);
+      this.done.add(idx);
+      this.confirmedBytes += this.chunkLength(idx);
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        this.queue.unshift(idx);
+      } else {
+        this.fatal = err;
+        this.abortAll();
+      }
+    } finally {
+      this.inflight.delete(idx);
+      this.emitProgress();
+    }
+    return this.worker(limit, processed + 1);
   }
 
-  async sendWithRetry(idx) {
-    for (let attempt = 0; ; attempt++) {
-      try {
-        return await this.sendChunk(idx);
-      } catch (err) {
-        if (err.name === 'AbortError' || err.fatal || attempt >= this.maxRetries) throw err;
-        const delay = Math.min(30000, 1000 * 2 ** attempt);
-        this.onNotice(
-          t('uploader.retryNotice', {
-            part: idx + 1,
-            err: err.message,
-            attempt: attempt + 1,
-            max: this.maxRetries,
-            sec: delay / 1000,
-          })
-        );
-        for (let w = 0; w < delay; w += 250) {
-          if (this.paused || this.cancelled || this.fatal) throw abortError();
-          await wait(250);
+  waitRetryDelay(delay) {
+    return new Promise((resolve, reject) => {
+      let timer = null;
+      let checker = null;
+      const cleanup = () => {
+        clearTimeout(timer);
+        clearInterval(checker);
+      };
+      const checkAbort = () => {
+        if (this.paused || this.cancelled || this.fatal) {
+          cleanup();
+          reject(abortError());
+          return true;
         }
-      }
+        return false;
+      };
+      if (checkAbort()) return;
+      checker = setInterval(checkAbort, 250);
+      timer = setTimeout(() => {
+        cleanup();
+        resolve();
+      }, delay);
+    });
+  }
+
+  async sendWithRetry(idx, attempt = 0) {
+    try {
+      return await this.sendChunk(idx);
+    } catch (err) {
+      if (err.name === 'AbortError' || err.fatal || attempt >= this.maxRetries) throw err;
+      const delay = Math.min(30000, 1000 * 2 ** attempt);
+      this.onNotice(
+        t('uploader.retryNotice', {
+          part: idx + 1,
+          err: err.message,
+          attempt: attempt + 1,
+          max: this.maxRetries,
+          sec: delay / 1000,
+        })
+      );
+      await this.waitRetryDelay(delay);
+      return this.sendWithRetry(idx, attempt + 1);
     }
   }
 

@@ -348,6 +348,15 @@ describe('uploader.js', () => {
     const up2 = new U.ChunkUploader(mkFile(4), { maxRetries: 0, onState: (s, d) => { if (s === 'error') err = d; } });
     await up2.start();
     assert.ok(err);
+
+    // aborta imediatamente quando já pausado e durante o intervalo de espera do backoff
+    const up3 = new U.ChunkUploader(mkFile(4));
+    up3.paused = true;
+    await assert.rejects(up3.waitRetryDelay(500), { name: 'AbortError' });
+
+    const up4 = new U.ChunkUploader(mkFile(4));
+    setTimeout(() => { up4.cancelled = true; }, 40);
+    await assert.rejects(up4.waitRetryDelay(2000), { name: 'AbortError' });
   });
 
   test('pausa, retomada e cancelamento', async () => {

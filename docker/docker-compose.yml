@@ -9,8 +9,8 @@ services:
     container_name: nulldrive
     restart: unless-stopped
     init: true                      # tini como PID 1 (sinais e processos zumbis)
-    ports:
-      - "${APP_PORT:-8000}:8000"
+    expose:
+      - "8000"
     environment:
       NODE_ENV: production
       HOST: 0.0.0.0

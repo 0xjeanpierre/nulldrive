@@ -138,7 +138,6 @@ const dropzone = $('#dropzone');
 const fileInput = $('#file-input');
 const box = $('#upload-box');
 const progress = $('#upload-progress');
-const bar = $('#upload-bar');
 const statusEl = $('#upload-status');
 const btnPause = $('#btn-pause');
 const btnResume = $('#btn-resume');
@@ -250,7 +249,7 @@ async function handleFile(file, { isDir = false } = {}) {
   $('#upload-name').textContent = file.name;
   $('#upload-size').textContent = formatBytes(file.size, 2);
   $('#upload-badge').textContent = fileBadge(file.name);
-  bar.style.width = '0%';
+  progress.value = 0;
   progress.className = 'progress';
   ['#stat-percent', '#stat-sent', '#stat-speed', '#stat-eta'].forEach((s) => ($(s).textContent = '—'));
   showView('box');
@@ -261,8 +260,7 @@ async function handleFile(file, { isDir = false } = {}) {
 
 function onProgress(p) {
   const pct = Math.min(100, p.percent);
-  bar.style.width = `${pct.toFixed(2)}%`;
-  progress.setAttribute('aria-valuenow', pct.toFixed(0));
+  progress.value = Number(pct.toFixed(2));
   const pctFormatted = getLang() === 'pt-BR' ? pct.toFixed(1).replace('.', ',') : pct.toFixed(1);
   $('#stat-percent').textContent = `${pctFormatted}%`;
   $('#stat-sent').textContent = `${formatBytes(p.sent)} / ${formatBytes(p.total)}`;
@@ -302,8 +300,8 @@ function onState(state, data) {
       setButtons({ resume: true, cancel: true });
       break;
     case 'finalizing':
-      progress.className = 'progress indeterminate';
-      bar.style.width = '';
+      progress.className = 'progress';
+      progress.removeAttribute('value');
       setStatus(t('home.statusFinalizing'));
       $('#stat-speed').textContent = '—';
       $('#stat-eta').textContent = '—';
@@ -311,10 +309,11 @@ function onState(state, data) {
       break;
     case 'done':
       progress.className = 'progress done';
-      bar.style.width = '100%';
+      progress.value = 100;
       showResult(data);
       break;
     case 'error':
+      if (!progress.hasAttribute('value')) progress.value = 0;
       progress.className = 'progress paused';
       setStatus(`✕ ${data?.message || t('home.statusError')}`, 'error');
       setButtons({ retry: true });

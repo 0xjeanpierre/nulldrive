@@ -894,47 +894,73 @@ a.btn.btn-primary.loading {
 }
 
 .progress {
-  position: relative;
+  display: block;
+  width: 100%;
   height: 10px;
+  border: none;
   border-radius: 999px;
   background: var(--progress-track);
   overflow: hidden;
+  appearance: none;
 }
 
-.progress-bar {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 0%;
-  border-radius: inherit;
+.progress::-webkit-progress-bar {
+  background: var(--progress-track);
+  border-radius: 999px;
+}
+
+.progress::-webkit-progress-value {
   background: var(--progress-fill);
+  border-radius: 999px;
   transition: width 0.3s linear;
 }
 
-.progress.paused .progress-bar {
+.progress::-moz-progress-bar {
+  background: var(--progress-fill);
+  border-radius: 999px;
+  transition: width 0.3s linear;
+}
+
+.progress.paused::-webkit-progress-value {
   filter: grayscale(1);
   opacity: 0.6;
 }
 
-.progress.done .progress-bar {
+.progress.paused::-moz-progress-bar {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.progress.done::-webkit-progress-value,
+.progress.done::-moz-progress-bar {
   background: var(--text);
 }
 
-.progress.indeterminate .progress-bar {
-  width: 35%;
+.progress:indeterminate {
+  background: var(--progress-track);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .progress.indeterminate .progress-bar {
-    animation: indeterminate 1.3s ease-in-out infinite;
+  .progress:indeterminate {
+    background: linear-gradient(90deg, var(--progress-track) 0%, var(--progress-fill) 35%, var(--progress-track) 70%) 0 0 / 200% 100%;
+    animation: indeterminate-slide 1.3s ease-in-out infinite;
   }
 }
 
-@keyframes indeterminate {
+.progress:indeterminate::-webkit-progress-bar {
+  background: transparent;
+}
+
+.progress:indeterminate::-moz-progress-bar {
+  background: transparent;
+}
+
+@keyframes indeterminate-slide {
   0% {
-    left: -35%;
+    background-position: 100% 0;
   }
   100% {
-    left: 100%;
+    background-position: -100% 0;
   }
 }
 
