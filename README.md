@@ -39,24 +39,25 @@ O projeto foi totalmente projetado para rodar isolado em Docker. Não é necess�
 
 ### 1. Iniciar a aplicação
 ```powershell
-docker compose up -d --build
+make up
 ```
-Acesse a aplicação no navegador em: **[http://localhost:8000](http://localhost:8000)** (e a documentação Swagger em **[http://localhost:8000/docs](http://localhost:8000/docs)**).
+Acesse a aplicação no navegador em: **[https://localhost](https://localhost)** (e a documentação Swagger em **[https://localhost/docs](https://localhost/docs)**).
 
 Para acompanhar os logs do servidor:
 ```powershell
-docker compose logs -f app
+make logs
 ```
 
 ### 2. Modo Desenvolvimento (com Hot Reload)
 Se quiser modificar o código com reinício automático:
 ```powershell
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+make dev
 ```
+No modo desenvolvimento, o Nginx responde em **[http://localhost:8080](http://localhost:8080)** (HTTP) e **[https://localhost:8443](https://localhost:8443)** (HTTPS).
 
 ### 3. Parar o serviço
 ```powershell
-docker compose down
+make down
 ```
 > *Nota: Os dados e uploads ficam salvos no volume nomeado `nulldrive-storage` e não são perdidos ao reiniciar o container. Para apagar completamente todos os arquivos e banco de dados, use `docker compose down -v`.*
 
@@ -64,7 +65,7 @@ docker compose down
 
 ## ⚙️ Configuração
 
-A configuração fica salva em [`config/config.json`](file:///c:/Users/jpos/Documents/dev/nulldrive/config/config.json) (montada como volume dentro do container):
+A configuração fica salva em [`app/config/config.json`](app/config/config.json) (montada como volume dentro do container):
 
 ```json
 {

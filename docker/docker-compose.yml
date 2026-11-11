@@ -1,0 +1,68 @@
+name: nulldrive
+
+services:
+  app:
+    build:
+      context: ../app
+      dockerfile: ../docker/Dockerfile
+    image: nulldrive:latest
+    container_name: nulldrive
+    restart: unless-stopped
+    init: true                      # tini como PID 1 (sinais e processos zumbis)
+    expose:
+      - "8000"
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 8000
+      STORAGE_DIR: /app/storage
+      CONFIG_PATH: /app/config/config.json
+      # Descomente para FORÇAR via env (tem prioridade sobre config.json e
+      # sobre alterações feitas por PUT /api/admin/config após reiniciar):
+      # RETENTION_DAYS: ${RETENTION_DAYS:-3}
+      # MAX_FILE_SIZE_BYTES: ${MAX_FILE_SIZE_BYTES:-1073741824}
+      # CHUNK_SIZE_BYTES: ${CHUNK_SIZE_BYTES:-52428800}
+      # CLEANUP_INTERVAL_MINUTES: ${CLEANUP_INTERVAL_MINUTES:-60}
+    volumes:
+      # Arquivos enviados, pastes, chunks temporários e banco SQLite
+      - nulldrive-storage:/app/storage
+      # Configuração editável pelo host e gravável pelo endpoint admin
+      - ../app/config:/app/config
+      # Alternativa: guardar os arquivos numa pasta do host (mais lento no Windows/WSL2)
+      # - ./storage:/app/storage
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - nulldrivenet
+
+  nginx:
+    image: nginx:alpine
+    container_name: nulldrive_nginx
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/05-generate-certs.sh:/docker-entrypoint.d/05-generate-certs.sh:ro
+      - ./nginx/certs:/etc/nginx/certs
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - nulldrivenet
+
+volumes:
+  nulldrive-storage:
+
+networks:
+  nulldrivenet:
+    driver: bridge

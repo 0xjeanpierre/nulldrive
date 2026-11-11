@@ -1,0 +1,16 @@
+# Uso (a partir da raiz): make dev
+services:
+  app:
+    environment:
+      NODE_ENV: development
+    command: ["node", "--watch", "src/server.js"]
+    volumes:
+      - ../app/src:/app/src
+      - ../app/public:/app/public
+    restart: "no"
+
+  nginx:
+    ports: !override
+      - "${NGINX_DEV_HTTP_PORT:-8080}:80"
+      - "${NGINX_DEV_HTTPS_PORT:-8443}:443"
+    restart: "no"

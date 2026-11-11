@@ -2,4 +2,6 @@ node_modules/
 storage/
 .env
 npm-debug.log*
-config/*.tmp
+app/config/*.tmp
+docker/nginx/certs/
+coverage/
