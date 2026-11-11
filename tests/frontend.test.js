@@ -5,18 +5,30 @@ import assert from 'node:assert/strict';
 class El {
   constructor(tag = 'div') {
     this.tagName = tag; this.dataset = {}; this.attrs = {}; this.children = []; this.listeners = {};
-    this.classList = { s: new Set(), add: (c) => this.classList.s.add(c), contains: (c) => this.classList.s.has(c) };
+    this.classList = {
+      s: new Set(),
+      add: (c) => this.classList.s.add(c),
+      remove: (c) => this.classList.s.delete(c),
+      toggle: (c, force) => (force === undefined ? (this.classList.s.has(c) ? this.classList.s.delete(c) : this.classList.s.add(c)) : (force ? this.classList.s.add(c) : this.classList.s.delete(c))),
+      contains: (c) => this.classList.s.has(c),
+    };
     this.textContent = ''; this.innerHTML = ''; this.value = ''; this.className = ''; this.title = ''; this.placeholder = '';
     this.sel = {};
   }
   setAttribute(k, v) { this.attrs[k] = v; }
   getAttribute(k) { return this.attrs[k]; }
+  removeAttribute(k) { delete this.attrs[k]; }
+  hasAttribute(k) { return k in this.attrs; }
   querySelector(s) { return this.sel[s] ?? null; }
   querySelectorAll(s) { return this.all?.[s] ?? []; }
   appendChild(c) { this.children.push(c); return c; }
   append(...c) { this.children.push(...c); }
   addEventListener(ev, fn) { (this.listeners[ev] ||= []).push(fn); }
   remove() { this.removed = true; }
+  focus() {}
+  reset() {}
+  click() {}
+  contains() { return false; }
   fire(ev, arg) { (this.listeners[ev] || []).forEach((f) => f(arg)); }
 }
 const store = new Map();
@@ -36,7 +48,10 @@ globalThis.document = {
   querySelector: (s) => byId[s.replace(/^#/, '')] ?? (s === 'meta[name="theme-color"]' ? byId.meta ?? null : null),
   querySelectorAll: (s) => globalThis.__cfgEls?.[s] ?? [],
 };
-globalThis.window = { dispatchEvent: (e) => (winListeners[e.type] ||= []).push(e) };
+globalThis.window = {
+  addEventListener: (ev, fn) => (winListeners[ev] ||= []).push(fn),
+  dispatchEvent: (e) => (winListeners[e.type] ||= []).push(e),
+};
 globalThis.CustomEvent = class { constructor(type, init) { this.type = type; this.detail = init?.detail; } };
 globalThis.location = { origin: 'http://x.test' };
 const cfgFetch = { retentionDays: 1, maxFileSizeBytes: 1024 ** 3, chunkSizeBytes: 1024, allowedExtensions: ['.zip'], maxPasteSizeBytes: 1024 ** 2, stats: { totalFiles: 1, totalPastes: 2, totalItems: 3, totalSizeBytes: 2048 } };
@@ -437,5 +452,83 @@ describe('uploader.js', () => {
     assert.equal(err.message, 'boom');
     const e = new U.ChunkUploader(mkFile(0));
     e.emitProgress();
+  });
+});
+
+describe('app.js: inicialização, paste e progress', () => {
+  test('inicializa sem TDZ, envia paste e atualiza <progress>', async () => {
+    const ids = [
+      'tabs', 'paste-form', 'paste-title', 'paste-content', 'paste-counter', 'btn-create-paste',
+      'paste-link', 'paste-md5', 'btn-open-paste', 'btn-download-paste-txt', 'btn-download-paste-md5',
+      'paste-result', 'btn-new-paste', 'dropzone', 'file-input', 'upload-box', 'upload-progress',
+      'upload-status', 'btn-pause', 'btn-resume', 'btn-cancel', 'btn-retry-select', 'resume-banner',
+      'btn-discard-pending', 'btn-new-upload', 'upload-name', 'upload-size', 'upload-badge',
+      'stat-percent', 'stat-sent', 'stat-speed', 'stat-eta', 'upload-result', 'file-link',
+      'file-md5', 'btn-open-file', 'btn-download-file', 'upload-result-meta', 'toast-root',
+    ];
+    const dom = {};
+    for (const id of ids) dom[id] = byId[id] = new El(id === 'upload-progress' ? 'progress' : 'div');
+    dom['upload-progress'].value = 0;
+    dom['upload-progress'].setAttribute('value', '0');
+
+    globalThis.history = { replaceState() {} };
+    globalThis.requestAnimationFrame = (fn) => { fn(); return 1; };
+    globalThis.cancelAnimationFrame = () => {};
+    globalThis.location.pathname = '/';
+    globalThis.location.hash = '';
+
+    let postedPaste = null;
+    fetchImpl = async (url, opts) => {
+      if (url === '/api/config/public') return resp(200, cfgFetch);
+      if (url === '/api/pastes') {
+        postedPaste = JSON.parse(opts.body);
+        return resp(201, { url: '/pastes/p1', md5: 'deadbeef' });
+      }
+      if (url === '/api/uploads/init') {
+        return resp(201, { uploadId: 'up1', chunkSize: 1024, totalChunks: 1, uploadedChunks: [] });
+      }
+      if (url === '/api/uploads/up1/complete') {
+        return resp(200, {
+          url: '/files/up1',
+          downloadUrl: '/api/files/up1/download',
+          fileName: 'ok.zip',
+          sizeBytes: 5,
+          md5: 'cafebabe',
+          expiresAt: Date.now() + 60_000,
+        });
+      }
+      return resp(404, { error: 'not found' });
+    };
+
+    // Garante inicialização sem ReferenceError/TDZ (ex: updateCounter antes de counterRaf)
+    await import('../app/public/js/app.js');
+    assert.match(dom['paste-counter'].textContent, /0/);
+
+    // Submit vazio exibe erro e não envia POST
+    dom['paste-form'].fire('submit', { preventDefault() {} });
+    await new Promise((r) => setImmediate(r));
+    assert.equal(postedPaste, null);
+
+    // Submit com conteúdo cria paste e exibe resultado
+    dom['paste-title'].value = 'titulo';
+    dom['paste-content'].value = 'olá mundo';
+    dom['paste-form'].fire('submit', { preventDefault() {} });
+    await new Promise((r) => setImmediate(r));
+    assert.deepEqual(postedPaste, { title: 'titulo', content: 'olá mundo' });
+    assert.equal(dom['paste-link'].value, 'http://x.test/pastes/p1');
+    assert.equal(dom['paste-md5'].value, 'deadbeef');
+    assert.ok(dom['paste-form'].classList.contains('hidden'));
+    assert.ok(!dom['paste-result'].classList.contains('hidden'));
+
+    // Seleção de arquivo valida extensão, executa upload e atualiza <progress>
+    FakeXHR.instances = [];
+    FakeXHR.handler = () => ({ status: 200, body: '{}' });
+    const file = Object.assign(new Blob(['hello']), { name: 'ok.zip', lastModified: 1 });
+    dom['file-input'].files = [file];
+    dom['file-input'].fire('change');
+    await new Promise((r) => setTimeout(r, 30));
+    assert.equal(dom['upload-progress'].value, 100);
+    assert.equal(dom['upload-progress'].className, 'progress done');
+    assert.equal(dom['file-link'].value, 'http://x.test/files/up1');
   });
 });

@@ -16,7 +16,7 @@ up: ## Inicia a aplicação em background via Docker Compose (HTTPS na porta 443
 build: ## Reconstrói a imagem Docker da aplicação
 	$(COMPOSE) build
 
-dev: ## Inicia em modo desenvolvimento com hot-reload (portas 8080 e 8443)
+dev: ## Inicia em modo desenvolvimento com hot-reload (portas 8000 e 8443)
 	$(COMPOSE) -f docker/docker-compose.dev.yml up --build
 
 down: ## Para e remove os containers (mantém os arquivos no volume)
@@ -37,13 +37,23 @@ ps: ## Lista o status dos containers
 cleanup: ## Dispara a limpeza imediata de arquivos expirados via API
 	curl -sk -X POST https://localhost:443/api/admin/cleanup && echo ""
 
+test: ## Roda os testes em container Docker e gera coverage/lcov.info
+	@./tests/run.sh
+
 scan: ## Roda o SonarQube Scanner sobre o projeto (usa scan/sonar-scan.sh)
 	@./scan/sonar-scan.sh
 
 check: ## Verifica a sintaxe de todos os arquivos JavaScript
-	@for f in app/src/*.js app/src/routes/*.js app/src/services/*.js app/src/utils/*.js app/public/js/*.js; do \
-		node --check "$$f" || exit 1; \
-	done
+	@if command -v node >/dev/null 2>&1; then \
+		for f in app/src/*.js app/src/routes/*.js app/src/services/*.js app/src/utils/*.js app/public/js/*.js; do \
+			node --check "$$f" || exit 1; \
+		done; \
+	else \
+		docker run --rm -v "$(CURDIR)/app:/work" -w /work nulldrive:latest sh -c '\
+			for f in src/*.js src/routes/*.js src/services/*.js src/utils/*.js public/js/*.js; do \
+				node --check "$$f" || exit 1; \
+			done'; \
+	fi
 	@echo "Sintaxe OK!"
 
 push: ## Adiciona alterações, solicita mensagem de commit e faz git push

@@ -20,7 +20,7 @@ docker run --rm --user "$(id -u):$(id -g)" -v "$ROOT:/work" -w /work/app "$IMAGE
   node --test --experimental-test-coverage \
     --test-reporter=spec --test-reporter-destination=stdout \
     --test-reporter=lcov --test-reporter-destination=../coverage/lcov.raw \
-    ../tests/unit.test.js ../tests/api.test.js ../tests/frontend.test.js
+    ../tests/unit.test.js ../tests/api.test.js ../tests/frontend.test.js ../tests/paste-form.test.js
   rc=$?
   rm -f node_modules
   exit $rc
