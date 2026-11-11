@@ -170,8 +170,8 @@ pre {
   background: var(--selection);
 }
 
-.hidden {
-  display: none !important;
+html .hidden {
+  display: none;
 }
 
 .muted {
@@ -723,9 +723,10 @@ a.btn.btn-primary:hover {
   border-radius: 12px;
 }
 
-.btn.loading {
+.btn.loading,
+a.btn.btn-primary.loading {
   pointer-events: none;
-  color: transparent !important;
+  color: transparent;
 }
 
 .btn.loading::after {
@@ -919,8 +920,13 @@ a.btn.btn-primary:hover {
 }
 
 .progress.indeterminate .progress-bar {
-  width: 35% !important;
-  animation: indeterminate 1.3s ease-in-out infinite;
+  width: 35%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .progress.indeterminate .progress-bar {
+    animation: indeterminate 1.3s ease-in-out infinite;
+  }
 }
 
 @keyframes indeterminate {
@@ -1101,9 +1107,9 @@ a.btn.btn-primary:hover {
   font-weight: 600;
 }
 
-.countdown {
+.meta b.countdown {
   font-variant-numeric: tabular-nums;
-  color: var(--text) !important;
+  color: var(--text);
 }
 
 .hash-box {
@@ -1162,10 +1168,10 @@ a.btn.btn-primary:hover {
   tab-size: 4;
 }
 
-.gutter {
+.code-view pre.gutter {
   position: sticky;
   left: 0;
-  padding: 16px 12px 16px 16px !important;
+  padding: 16px 12px 16px 16px;
   text-align: right;
   color: var(--gutter-fg);
   background: var(--code-bg);
@@ -1173,9 +1179,9 @@ a.btn.btn-primary:hover {
   user-select: none;
 }
 
-.code {
+.code-view pre.code {
   flex: 1;
-  padding: 16px 18px !important;
+  padding: 16px 18px;
   color: var(--code-fg);
   white-space: pre;
 }
@@ -1293,40 +1299,40 @@ a.btn.btn-primary:hover {
   display: none;
 }
 
-[data-theme='dark'] .swagger-ui,
-[data-theme='dark'] .swagger-ui .info .title,
-[data-theme='dark'] .swagger-ui .info p,
-[data-theme='dark'] .swagger-ui .info li,
-[data-theme='dark'] .swagger-ui .opblock-tag,
-[data-theme='dark'] .swagger-ui .opblock .opblock-summary-path,
-[data-theme='dark'] .swagger-ui .opblock .opblock-summary-description,
-[data-theme='dark'] .swagger-ui .opblock-description-wrapper p,
-[data-theme='dark'] .swagger-ui .parameter__name,
-[data-theme='dark'] .swagger-ui .parameter__type,
-[data-theme='dark'] .swagger-ui .response-col_status,
-[data-theme='dark'] .swagger-ui .response-col_description,
-[data-theme='dark'] .swagger-ui table thead tr th,
-[data-theme='dark'] .swagger-ui table thead tr td,
-[data-theme='dark'] .swagger-ui .tab li,
-[data-theme='dark'] .swagger-ui .model-title,
-[data-theme='dark'] .swagger-ui .model,
-[data-theme='dark'] .swagger-ui label,
-[data-theme='dark'] .swagger-ui .btn {
-  color: var(--text) !important;
+[data-theme='dark'] #swagger-ui .swagger-ui,
+[data-theme='dark'] #swagger-ui .swagger-ui .info .title,
+[data-theme='dark'] #swagger-ui .swagger-ui .info p,
+[data-theme='dark'] #swagger-ui .swagger-ui .info li,
+[data-theme='dark'] #swagger-ui .swagger-ui .opblock-tag,
+[data-theme='dark'] #swagger-ui .swagger-ui .opblock .opblock-summary-path,
+[data-theme='dark'] #swagger-ui .swagger-ui .opblock .opblock-summary-description,
+[data-theme='dark'] #swagger-ui .swagger-ui .opblock-description-wrapper p,
+[data-theme='dark'] #swagger-ui .swagger-ui .parameter__name,
+[data-theme='dark'] #swagger-ui .swagger-ui .parameter__type,
+[data-theme='dark'] #swagger-ui .swagger-ui .response-col_status,
+[data-theme='dark'] #swagger-ui .swagger-ui .response-col_description,
+[data-theme='dark'] #swagger-ui .swagger-ui table thead tr th,
+[data-theme='dark'] #swagger-ui .swagger-ui table thead tr td,
+[data-theme='dark'] #swagger-ui .swagger-ui .tab li,
+[data-theme='dark'] #swagger-ui .swagger-ui .model-title,
+[data-theme='dark'] #swagger-ui .swagger-ui .model,
+[data-theme='dark'] #swagger-ui .swagger-ui label,
+[data-theme='dark'] #swagger-ui .swagger-ui .btn {
+  color: var(--text);
 }
 
-[data-theme='dark'] .swagger-ui .scheme-container,
-[data-theme='dark'] .swagger-ui .opblock .opblock-section-header {
-  background: var(--surface-2) !important;
-  box-shadow: none !important;
+[data-theme='dark'] #swagger-ui .swagger-ui .scheme-container,
+[data-theme='dark'] #swagger-ui .swagger-ui .opblock .opblock-section-header {
+  background: var(--surface-2);
+  box-shadow: none;
 }
 
-[data-theme='dark'] .swagger-ui select,
-[data-theme='dark'] .swagger-ui input[type='text'],
-[data-theme='dark'] .swagger-ui textarea {
-  background: var(--field-bg) !important;
-  color: var(--text) !important;
-  border-color: var(--border-strong) !important;
+[data-theme='dark'] #swagger-ui .swagger-ui select,
+[data-theme='dark'] #swagger-ui .swagger-ui input[type='text'],
+[data-theme='dark'] #swagger-ui .swagger-ui textarea {
+  background: var(--field-bg);
+  color: var(--text);
+  border-color: var(--border-strong);
 }
 
 /* ===================== Footer ===================== */
@@ -1432,11 +1438,11 @@ a.btn.btn-primary:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  :root:root:root *,
+  :root:root:root *::before,
+  :root:root:root *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
   }
 }

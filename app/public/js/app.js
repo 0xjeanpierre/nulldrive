@@ -303,6 +303,7 @@ function onState(state, data) {
       break;
     case 'finalizing':
       progress.className = 'progress indeterminate';
+      bar.style.width = '';
       setStatus(t('home.statusFinalizing'));
       $('#stat-speed').textContent = '—';
       $('#stat-eta').textContent = '—';
